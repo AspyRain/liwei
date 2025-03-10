@@ -1,0 +1,105 @@
+
+.curtain {
+position: fixed;
+height: 100%;
+width: 50%;
+background-repeat: no-repeat;
+transition: all 0.7s ease;
+}
+
+.left {
+left: 0;
+background-image:  url('../imgs/left2.jpg');
+background-size: cover; /* 将背景图片缩放以填充整个组件 */
+}
+
+.right {
+right: 0;
+background-image:  url('../imgs/right2.jpg');
+background-size: cover; /* 将背景图片缩放以填充整个组件 */
+}
+
+#login_button {
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+z-index: 1;
+}
+
+#return_button {
+  position: fixed;
+  top: 85%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  }
+#login_button:hover,
+#return_button:hover {
+  background-color: #4cc9f0;
+  -webkit-box-shadow: 10px 10px 99px 6px rgba(76,201,240,1);
+  -moz-box-shadow: 10px 10px 99px 6px rgba(76,201,240,1);
+  box-shadow: 10px 10px 99px 6px rgba(76,201,240,1);
+}
+
+#login_button {
+width: 100px;
+height: 100px;
+border-radius: 50%;
+background-color: #fff;
+border: none;
+box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+cursor: pointer;
+transition: all 0.7s ease;
+background-image:url('../imgs/login_icon.png') ;
+background-size:110%;
+background-position: center;
+}
+
+#return_button {
+  display: none;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: none;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: all 0.7s ease;
+  background-image:url('../imgs/back_icon.png') ;
+  background-size: 120%;
+  background-position: center;
+  }
+
+
+  #login_button.hide {
+    opacity: 0;
+    pointer-events: none;
+    }
+    
+.curtain.hide {
+width: 50%;
+}
+
+.left.hide {
+  transform: translateX(-50%);
+  }
+  
+.right.hide {
+  transform: translateX(50%);
+  }
+
+.header {
+  background-color: #d8f1fd;
+}
+
+.curtain {
+background-repeat: no-repeat;
+background-size: cover; /* 将背景图片缩放以填充整个幕布 /
+background-position: center; / 将背景图片居中 */
+}
+
+.main {
+  background-color: #d8f1fd;
+}
+

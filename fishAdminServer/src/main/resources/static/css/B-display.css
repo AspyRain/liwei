@@ -1,0 +1,19 @@
+#container {
+    position: absolute;
+    top: auto;
+    left: 0;
+    background: linear-gradient(to right top,#cce5e1,#7bd9e8);    
+    width: 100%;
+    height: 100%;
+    
+}
+#map {
+    width: 100%;
+    height: 90%;
+    overflow: cover;
+    margin: 0;
+    }
+.badge{
+    top: 50%;
+
+}

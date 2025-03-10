@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link rel="icon" href="imgs/Icon.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/style.css">
+    <title>欢迎！</title>
+</head>
+
+<body class="main">
+<header class ="header">
+    <img src="imgs/Icon.png" alt="Fish" title="渔网图标">
+    <h1>渔网</h1>
+</header>
+<div class="curtain left"></div>
+<div class="curtain right"></div>
+<div class="button-container">
+    <button id="login_button" class="show"></button>
+    <button id="return_button" class="hide"></button>
+</div>
+<div class="shell" id="RL">
+
+    <div class="container b-container" id="b-container">
+<!-- 登录表单,点击按钮激活LoginIN()-->
+        <form class="form" id="b-form">
+            <h2 class="form_title title">登入账号</h2>
+            <span class="form_span">请登录</span>
+            <input type="text" class="form_input" placeholder="用户名" v-model="Admin.username">
+            <input type="password" class="form_input" placeholder="密码" v-model="Admin.password">
+            <button class="form_button button submit" type="button" @click="LoginIn">登录</button>
+        </form>
+    </div>
+    <div class="container a-container" id="a-container">
+<!--        注册表单,点击按钮激活Register()-->
+        <form class="form" id="a-form">
+            <h2 class="form_title title">创建账号</h2>
+            <span class="form_span">请输入官方提供的KEY和您的用户名、密码</span>
+            <input type="text" class="form_input" placeholder="KEY" v-model="RegisterUser.key">
+            <input type="text" class="form_input" placeholder="用户名" v-model="RegisterUser.username">
+            <input type="password" class="form_input" placeholder="密码" v-model="RegisterUser.password">
+            <button class="form_button button submit" type="button" @click="Register">注册</button>
+        </form>
+    </div>
+
+
+    <div class="switch" id="switch-cnt">
+        <div class="switch_circle"></div>
+        <div class="switch_circle switch_circle-t"></div>
+        <div class="switch_container" id="switch-c1">
+            <h2 class="switch_title title" style="letter-spacing: 0;">欢迎！</h2>
+            <p class="switch_description description">已有账号？点击登录！</p>
+            <button class="switch_button button switch-btn">登录</button>
+        </div>
+
+        <div class="switch_container is-hidden" id="switch-c2">
+            <h2 class="switch_title title" style="letter-spacing: 0;">加入BIMS!</h2>
+            <p class="switch_description description">没有账号？注册一个!</p>
+            <button class="switch_button button switch-btn">加入</button>
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+    let app = new Vue({
+        el: "#RL",
+        mounted(){
+            let loginButton = document.querySelector('#login_button');
+            let returnButton = document.querySelector('#return_button');
+            let leftCurtain = document.querySelector('.left');
+            let rightCurtain = document.querySelector('.right');
+            let switchCtn = document.querySelector("#switch-cnt");
+            let switchC1 = document.querySelector("#switch-c1");
+            let switchC2 = document.querySelector("#switch-c2");
+            let switchCircle = document.querySelectorAll(".switch_circle");
+            let switchBtn = document.querySelectorAll(".switch-btn");
+            let aContainer = document.querySelector("#a-container");
+            let bContainer = document.querySelector("#b-container");
+
+            loginButton.addEventListener('click', function () {
+                leftCurtain.classList.add('hide');
+                rightCurtain.classList.add('hide');
+                loginButton.classList.add('hide');
+                setTimeout(() => {
+                    returnButton.style.display = 'block';
+                }, 700);
+            });
+
+            returnButton.addEventListener('click', function () {
+                leftCurtain.classList.remove('hide');
+                rightCurtain.classList.remove('hide');
+                loginButton.classList.remove('hide');
+                returnButton.style.display = 'none';
+            });
+
+            let changeForm = (e) => {
+                switchCtn.classList.add("is-gx");
+                setTimeout(function () {
+                    switchCtn.classList.remove("is-gx");
+                }, 1500)
+                switchCtn.classList.toggle("is-txr");
+                switchCircle[0].classList.toggle("is-txr");
+                switchCircle[1].classList.toggle("is-txr");
+
+                switchC1.classList.toggle("is-hidden");
+                switchC2.classList.toggle("is-hidden");
+                aContainer.classList.toggle("is-txl");
+                bContainer.classList.toggle("is-txl");
+                bContainer.classList.toggle("is-z");
+            }
+
+            let shell = (e) => {
+                for (let i = 0; i < switchBtn.length; i++)
+                    switchBtn[i].addEventListener("click", changeForm)
+            }
+
+            shell();
+        },
+        data() {
+            return {
+                Admin: {
+                    username: "",
+                    password: "",
+                },
+                RegisterUser: {
+                    key: "",
+                    username: "",
+                    password: ""
+                },
+                Message: {
+                    mes: "",
+                    usertype: ""
+                },
+                isLogin: "0",
+            }
+        },
+        methods: {
+            LoginIn() {
+                let _this=this
+                if (this.Admin.username === "" || this.Admin.password === "") {
+                    alert("用户名或密码为空!");
+                } else {
+                    axios({
+                        method: "get",
+                        url: "admin/login",
+                        params: {
+                            username: _this.Admin.username,
+                            password: _this.Admin.password
+                        }
+                    }).then(resp => {
+                        this.Message = resp.data;
+                        if (this.Message === 'success') {
+                            alert("登录成功");
+                            // 跳转到B-display.html页面，并传递用户名和用户类型
+                            window.location.href = `B-display.html?username=${this.Admin.username}&usertype=${this.Message.usertype}`;
+                        } else {
+                            alert("用户名或密码错误!");
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }
+            },
+            Register() {
+                let _this=this
+                if (this.RegisterUser.key === "" || this.RegisterUser.username === "" || this.RegisterUser.password === "") {
+                    alert("请填写完整信息!");
+                } else {
+                    axios({
+                        method: "post",
+                        url: "admin/register",
+                        data: _this.RegisterUser
+                    }).then(resp => {
+
+                        // 清空注册表的数据
+                        this.RegisterUser.key = "";
+                        this.RegisterUser.username = "";
+                        this.RegisterUser.password = "";
+                        this.Message = resp.data;
+                        if (this.Message === 'success') {
+                            alert("注册成功");
+                            changeForm();
+                        } else if (this.Message.mes === '0') {
+                            alert("用户已存在!");
+                        } else {
+                            alert("KEY错误!");
+                        }
+
+
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }
+            }
+        }
+    });
+</script>
+
+</html>
