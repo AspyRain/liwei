@@ -1,9 +1,11 @@
 package com.fishadminserver.Repository;
 
 import com.fishadminserver.Entity.FishRecords;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface FishRecordsRepository extends JpaRepository<FishRecords, Long> {
-    public FishRecords findById(int id);
-    public void deleteById(int id);
-}
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+
+
+public interface FishRecordsRepository extends JpaRepository<FishRecords, Integer> {}
+

@@ -15,15 +15,13 @@ public class WaterQualityRecords {
     private float phValue;
     private float turbidity;
     private float temperature;
-    private Date date;
     private int status;
 
-    public WaterQualityRecords(int id, float phValue, float turbidity, float temperature, Date date, int status) {
+    public WaterQualityRecords(int id, float phValue, float turbidity, float temperature, int status) {
         this.id = id;
         this.phValue = phValue;
         this.turbidity = turbidity;
         this.temperature = temperature;
-        this.date = date;
         this.status = status;
     }
 
