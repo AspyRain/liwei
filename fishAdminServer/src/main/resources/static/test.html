@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>上传鱼类图片（Base64）</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      text-align: center;
+    }
+    input[type="file"] {
+      margin: 20px 0;
+    }
+    #preview {
+      margin-top: 20px;
+      max-width: 300px;
+      display: none;
+    }
+    #message {
+      margin-top: 20px;
+      color: green;
+    }
+    #error {
+      margin-top: 20px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<h2>上传鱼类图片（Base64 编码）</h2>
+
+<form id="uploadForm">
+  <label for="fishId">输入鱼的 ID：</label>
+  <input type="number" id="fishId" name="fishId" required>
+  <br><br>
+
+  <input type="file" id="imageInput" accept="image/png" required>
+  <br>
+
+  <img id="preview" alt="图片预览">
+  <br>
+
+  <button type="submit">上传图片</button>
+</form>
+
+<p id="message"></p>
+<p id="error"></p>
+
+<script>
+  let base64String = "";  // 存储 Base64 编码
+
+  document.getElementById("imageInput").addEventListener("change", function(event) {
+    let file = event.target.files[0];
+
+    if (file && file.type === "image/png") {
+      let reader = new FileReader();
+      reader.onload = function(e) {
+        let preview = document.getElementById("preview");
+        preview.src = e.target.result;
+        preview.style.display = "block";
+
+        base64String = e.target.result; // **完整保存 Base64 数据（带前缀）**
+      };
+      reader.readAsDataURL(file);
+    } else {
+      document.getElementById("preview").style.display = "none";
+      alert("仅支持 PNG 格式的图片！");
+      event.target.value = "";  // 清空选择的文件
+    }
+  });
+
+  document.getElementById("uploadForm").addEventListener("submit", function(event) {
+    event.preventDefault();  // 阻止默认提交
+
+    let fishId = document.getElementById("fishId").value;
+
+    if (!fishId || !base64String) {
+      document.getElementById("error").innerText = "请输入鱼的 ID 并选择一张 PNG 图片！";
+      return;
+    }
+
+    let payload = {
+      fishId: parseInt(fishId),
+      imageData: base64String  // **完整发送 Base64 数据**
+    };
+
+    fetch("http://localhost:8080/fishwater/uploadImage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+            .then(response => response.text())
+            .then(data => {
+              document.getElementById("message").innerText = data;
+              document.getElementById("error").innerText = "";
+            })
+            .catch(error => {
+              document.getElementById("error").innerText = "上传失败，请重试！";
+              document.getElementById("message").innerText = "";
+            });
+  });
+</script>
+
+</body>
+</html>

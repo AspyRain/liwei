@@ -41,12 +41,7 @@ body {
     vertical-align: middle;
 }
 
-.container {
-    display: flex;
-    width: 90%;
-    height: 80vh;
-    gap: 10px;
-}
+
 
 .sidebar, .data-section, .image-section {
     border-radius: 20px;
@@ -55,16 +50,6 @@ body {
     background: white;
 }
 
-.sidebar {
-    width: 20%;
-}
 
-.content {
-    display: flex;
-    flex-grow: 1;
-    gap: 10px;
-}
 
-.data-section, .image-section {
-    flex: 1;
-}
+
