@@ -1,0 +1,70 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #d8f1fd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+    background-size: cover;
+    margin-bottom: 10px;
+    backdrop-filter: blur(5px);
+    background-position: center;
+    box-shadow: 5px 5px 5px #a7a8ab, -5px -5px 5px #d8d4d4;
+    width: 100%;
+    padding: 10px; /* 纵向长度减小 */
+}
+
+.header h1 {
+    display: inline-block;
+    margin: 0;
+    padding: 10px; /* 纵向长度同步调整 */
+    font-size: 24px;
+    color: #0b225b;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.header img {
+    display: inline-block;
+    margin: 0;
+    height: 30px;
+    vertical-align: middle;
+}
+
+.container {
+    display: flex;
+    width: 90%;
+    height: 80vh;
+    gap: 10px;
+}
+
+.sidebar, .data-section, .image-section {
+    border-radius: 20px;
+    box-shadow: 5px 5px 5px #a7a8ab, -5px -5px 5px #d8d4d4;
+    padding: 20px;
+    background: white;
+}
+
+.sidebar {
+    width: 20%;
+}
+
+.content {
+    display: flex;
+    flex-grow: 1;
+    gap: 10px;
+}
+
+.data-section, .image-section {
+    flex: 1;
+}

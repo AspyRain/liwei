@@ -38,8 +38,7 @@
 <!--        注册表单,点击按钮激活Register()-->
         <form class="form" id="a-form">
             <h2 class="form_title title">创建账号</h2>
-            <span class="form_span">请输入官方提供的KEY和您的用户名、密码</span>
-            <input type="text" class="form_input" placeholder="KEY" v-model="RegisterUser.key">
+            <span class="form_span">请输入您的用户名、密码</span>
             <input type="text" class="form_input" placeholder="用户名" v-model="RegisterUser.username">
             <input type="password" class="form_input" placeholder="密码" v-model="RegisterUser.password">
             <button class="form_button button submit" type="button" @click="Register">注册</button>
@@ -57,7 +56,7 @@
         </div>
 
         <div class="switch_container is-hidden" id="switch-c2">
-            <h2 class="switch_title title" style="letter-spacing: 0;">加入BIMS!</h2>
+            <h2 class="switch_title title" style="letter-spacing: 0;">注册账号!</h2>
             <p class="switch_description description">没有账号？注册一个!</p>
             <button class="switch_button button switch-btn">加入</button>
         </div>
@@ -129,7 +128,6 @@
                     password: "",
                 },
                 RegisterUser: {
-                    key: "",
                     username: "",
                     password: ""
                 },
@@ -157,8 +155,8 @@
                         this.Message = resp.data;
                         if (this.Message === 'success') {
                             alert("登录成功");
-                            // 跳转到B-display.html页面，并传递用户名和用户类型
-                            window.location.href = `B-display.html?username=${this.Admin.username}&usertype=${this.Message.usertype}`;
+                            // 跳转到主页面，并传递用户名
+                            window.location.href = `main.html?username=${this.Admin.username}`;
                         } else {
                             alert("用户名或密码错误!");
                         }
@@ -169,7 +167,7 @@
             },
             Register() {
                 let _this=this
-                if (this.RegisterUser.key === "" || this.RegisterUser.username === "" || this.RegisterUser.password === "") {
+                if (this.RegisterUser.username === "" || this.RegisterUser.password === "") {
                     alert("请填写完整信息!");
                 } else {
                     axios({
@@ -177,9 +175,6 @@
                         url: "admin/register",
                         data: _this.RegisterUser
                     }).then(resp => {
-
-                        // 清空注册表的数据
-                        this.RegisterUser.key = "";
                         this.RegisterUser.username = "";
                         this.RegisterUser.password = "";
                         this.Message = resp.data;
