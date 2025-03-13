@@ -4,8 +4,8 @@ import com.fishadminserver.Entity.FishWater;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.time.LocalDateTime;
-import java.time.LocalDate;
 import java.util.List;
 
 public interface FishWaterRepository extends JpaRepository<FishWater, Integer> {
@@ -15,14 +15,17 @@ public interface FishWaterRepository extends JpaRepository<FishWater, Integer> {
     List<FishWater> findRecentRecords(@Param("startTime") LocalDateTime startTime);
 
     // 统计前 n 天的平均值
-    @Query("SELECT fw.date, AVG(f.speed), AVG(f.size), AVG(f.status), " +
-            "AVG(w.phValue), AVG(w.turbidity), AVG(w.temperature), AVG(w.status) " +
-            "FROM FishWater fw " +
-            "JOIN fw.fish f " +
-            "JOIN fw.waterQuality w " +
-            "WHERE fw.date >= :startDate " +
-            "GROUP BY fw.date " +
-            "ORDER BY fw.date DESC")
-    List<Object[]> findDailyAverages(@Param("startDate") LocalDate startDate);
+    @Query(value = "SELECT DATE(fw.date) AS day, AVG(f.speed), AVG(f.size), ROUND(AVG(f.status)), " +
+            "AVG(wq.phValue), AVG(wq.turbidity), AVG(wq.temperature), ROUND(AVG(wq.status)) " +
+            "FROM fish_water fw " +
+            "JOIN fishrecords f ON fw.fish_id = f.id " +
+            "JOIN wqrecords wq ON fw.wq_id = wq.id " +
+            "WHERE fw.date >= :startDate " +  // 过滤起始日期
+            "AND fw.date < DATE_ADD(:startDate, INTERVAL :days DAY) " +  // 确保查询范围
+            "GROUP BY DATE(fw.date) " +
+            "ORDER BY DATE(fw.date) DESC", nativeQuery = true)
+    List<Object[]> findDailyAverages(@Param("startDate") LocalDateTime startDate, @Param("days") int days);
+
+
 
 }

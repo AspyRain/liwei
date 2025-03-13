@@ -77,17 +77,20 @@ public class FishWaterService {
     @Transactional(readOnly = true)
     public List<DailyAverageDTO> getDailyAverages(int days) {
         LocalDate startDate = LocalDate.now().minusDays(days);
-        List<Object[]> results = fishWaterRepository.findDailyAverages(startDate);
+        LocalDateTime startDateTime = startDate.atStartOfDay(); // 设定起始时间
+        List<Object[]> results = fishWaterRepository.findDailyAverages(startDateTime, days);
 
         return results.stream().map(obj -> new DailyAverageDTO(
-                (LocalDate) obj[0],  // 日期
-                (Double) obj[1],      // 平均速度
-                (Double) obj[2],      // 平均体型
-                ((Double) obj[3]).intValue(),  // 鱼状态（转换为整数）
-                (Double) obj[4],      // 平均 pH 值
-                (Double) obj[5],      // 平均浑浊度
-                (Double) obj[6],      // 平均温度
-                ((Double) obj[7]).intValue()   // 水质状态（转换为整数）
+                ((java.sql.Date) obj[0]).toLocalDate().atStartOfDay(), // 日期（转换为 LocalDateTime）
+                ((Number) obj[1]).doubleValue(), // 平均速度
+                ((Number) obj[2]).doubleValue(), // 平均体型
+                ((Number) obj[3]).intValue(),   // 鱼状态
+                ((Number) obj[4]).doubleValue(), // 平均 pH 值
+                ((Number) obj[5]).doubleValue(), // 平均浑浊度
+                ((Number) obj[6]).doubleValue(), // 平均温度
+                ((Number) obj[7]).intValue()    // 水质状态
         )).collect(Collectors.toList());
     }
+
+
 }

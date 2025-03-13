@@ -64,6 +64,8 @@ public class FishWaterController {
      */
     @GetMapping("/dailyAverage/{days}")
     public ResponseEntity<List<DailyAverageDTO>> getDailyAverages(@PathVariable int days) {
-        return ResponseEntity.ok(fishWaterService.getDailyAverages(days));
+
+        List<DailyAverageDTO> dailyAverageDTOS=fishWaterService.getDailyAverages(days);
+        return ResponseEntity.ok(dailyAverageDTOS);
     }
 }
