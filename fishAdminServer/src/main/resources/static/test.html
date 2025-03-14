@@ -1,264 +1,69 @@
 <!DOCTYPE html>
-<html lang="zh">
-
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-  <link rel="icon" href="imgs/Icon.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Fish Image</title>
+    <script>
+        // 将图片转换为 Base64 字符串，并保留 image/* 格式
+        function encodeImageToBase64() {
+            const fileInput = document.getElementById("imageInput");
+            const file = fileInput.files[0];
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <!-- Material Design Bootstrap -->
-  <link rel="stylesheet" href="css/mdb.min.css">
-  <!-- Your custom styles (optional) -->
-  <link rel="stylesheet" href="css/main.css">
-  <link href="css/main_tailwind.css" rel="stylesheet">
-  <!-- Element UI -->
-  <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
-  <script src="element-ui/lib/index.js"></script>
-  <title>欢迎！</title>
-</head>
-
-<body>
-  <div id="app" class="flex flex-col w-screen h-screen items-center">
-    <header class="h-15 rounded-b-lg bg-cyan-50 flex place-content-center w-screen shadow-lg">
-      <div class="flex justify-center items-center">
-        <img src="imgs/Icon.png" alt="Fish" title="渔网图标" class="h-10 mr-3">
-        <h class="text-xl font-bold text-sky-900  text-center">渔网</h>
-      </div>
-    </header>
-    <div class="w-screen flex justify-start h-full ">
-      <div class="w-1/7 bg-white/30 rounded-2xl m-3 grid content-around backdrop-blur-md">
-        <div class="bg-sky-600/30 w-full  flex justify-center items-center rounded-xl">
-          <div class="flex flex-col p-6  text-center w-full">
-            <p class="text-xl font-mono text-blue-800 mt-2">{{ sys_date }}</p> <!-- 绑定 Vue 的 `time` -->
-            <p class="text-xl font-mono text-blue-800 mt-2">{{ sys_time }}</p>
-          </div>
-        </div>
-        <div
-          class="bg-cyan-50 font-bold font-sans hover:bg-cyan-200 w-full h-10 flex justify-center items-center rounded-xl">
-          数据视图</div>
-        <div
-          class="bg-cyan-50 font-bold font-sans hover:bg-cyan-200 w-full h-10 flex justify-center items-center rounded-xl">
-          数据表格</div>
-        <div
-          class="bg-cyan-50 font-bold font-sans hover:bg-cyan-200 w-full h-10 flex justify-center items-center rounded-xl">
-          查看鱼塘</div>
-      </div>
-      <div class="flex flex-col w-6/7 bg-white/30 rounded-2xl m-3 backdrop-blur-md">
-        <div class="bg-white/70 rounded-2xl p-4 w-full">
-          <h2 class="text-lg font-bold text-center mb-2">实时数据</h2>
-          <div v-if="latestData.fish">
-            <p class="text-gray-600">鱼速: <span class="text-blue-600">{{ latestData.fish.speed }} m/s</span></p>
-            <p class="text-gray-600">鱼体长: <span class="text-blue-600">{{ latestData.fish.size }} cm</span></p>
-          </div>
-          <div v-if="latestData.waterQuality">
-            <p class="text-gray-600">pH 值: <span class="text-blue-600">{{ latestData.waterQuality.phValue }}</span></p>
-            <p class="text-gray-600">浊度: <span class="text-blue-600">{{ latestData.waterQuality.turbidity }}</span></p>
-            <p class="text-gray-600">温度: <span class="text-blue-600">{{ latestData.waterQuality.temperature }} °C</span>
-            </p>
-          </div>
-        </div>
-
-        <div class="rounded-2xl backdrop-blur-md grid grid-cols-1 gap-4 w-full overflow-auto my-3">
-          <div class="flex justify-center mt-2 space-x-2">
-            <button class="bg-blue-500 text-white px-3 py-1 rounded" @click="handleRangeSelection(1)">前24小时</button>
-            <button class="bg-green-500 text-white px-3 py-1 rounded" @click="handleRangeSelection(7)">前7天</button>
-            <input v-model="customDays" type="number" min="1" class="border rounded px-2 py-1 w-16 text-center"
-              placeholder="天数">
-            <button class="bg-purple-500 text-white px-3 py-1 rounded" @click="handleRangeSelection(customDays)">前{{
-              customDays }}天</button>
-          </div>
-
-
-          <div v-for="(chart, index) in charts" :key="index"
-            class="bg-white/70 rounded-2xl backdrop-blur-md w-full h-96 p-4">
-            <div :id="chart.id" class="h-80"></div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-  <script src="js/axios-0.18.0.js"></script>
-  <script>
-    new Vue({
-      el: "#app",
-      data: {
-        sys_date: "",
-        sys_time: "",
-        rawData: [],
-        latestData: {}, // 存储最近一条数据
-        customDays: 1,
-        intervalId: null, // 定时器 ID
-        charts: [
-          { id: "chart-speed", title: "鱼速 (m/s)", key: "fish.speed" },
-          { id: "chart-size", title: "鱼体长 (cm)", key: "fish.size" },
-          { id: "chart-ph", title: "pH 值", key: "waterQuality.phValue" },
-          { id: "chart-turbidity", title: "浊度", key: "waterQuality.turbidity" },
-          { id: "chart-temperature", title: "温度 (°C)", key: "waterQuality.temperature" }
-        ]
-      },
-      mounted() {
-        this.updateTime();
-        setInterval(this.updateTime, 1000);
-
-        this.fetchDailyAverage(3); // 默认获取最近 24 小时数据
-        this.fetchLatestData(); // 获取最近一条数据
-        this.intervalId = setInterval(this.fetchLatestData, 60000); // 每 1 分钟更新一次
-      },
-      beforeDestroy() {
-        clearInterval(this.intervalId);
-      },
-      methods: {
-        updateTime() {
-          const now = new Date();
-          this.sys_date = now.toISOString().split("T")[0];
-          this.sys_time = now.toTimeString().split(" ")[0].slice(0, 5);
-        },
-
-        /**
-         * 每分钟获取最新一条数据，并更新到实时数据
-         */
-        async fetchLatestData() {
-          try {
-            let response = await axios.get("http://localhost:8080/fishwater/recent");
-            if (response.data.length > 0) {
-              this.latestData = response.data[response.data.length - 1]; // 取最后一条
+            if (!file) {
+                alert("Please select an image first.");
+                return;
             }
-          } catch (error) {
-            console.error("获取最新数据失败", error);
-          }
-        },
 
-        /**
-         * 获取最近 24 小时的数据
-         */
-        async fetchRecentData() {
-          try {
-            let response = await axios.get("http://localhost:8080/fishwater/recent");
-            this.rawData = response.data;
-            this.drawAllCharts("hour"); // 刻度设为小时
-          } catch (error) {
-            console.error("获取最近 24 小时数据失败", error);
-          }
-        },
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                // 获取 Base64 编码字符串，包括前缀 (例如 data:image/png;base64,)
+                const base64String = reader.result;
 
-        /**
-         * 获取前 n 天的每日平均数据
-         */
-        async fetchDailyAverage(days) {
-          try {
-            let response = await axios.get(`http://localhost:8080/fishwater/dailyAverage/${days}`);
-            let avgDatas = response.data; // 确保返回的是数组
-            console.log("后端返回的平均数据:", avgDatas);
+                // 填充请求数据
+                const fishId = document.getElementById("fishId").value;
+                const requestData = {
+                    fishId: fishId,
+                    imageData: base64String  // 直接将包含前缀的Base64字符串传递
+                };
 
-            // 先清空 `rawData`，防止数据重复
-            this.rawData = [];
+                // 调用上传接口
+                uploadImage(requestData);
+            };
+            reader.readAsDataURL(file);
+        }
 
-            // 遍历 `avgDatas`，转换格式
-            avgDatas.forEach(avgData => {
-              this.rawData.push({
-                date: avgData.date, // 直接使用后端返回的 `date`
-                fish: {
-                  speed: avgData.avgSpeed,
-                  size: avgData.avgSize,
-                  status: avgData.avgFishStatus
+        // 上传图片数据
+        function uploadImage(data) {
+            fetch("http://localhost:8080/fishwater/uploadImage", {  // Fixed URL here
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
                 },
-                waterQuality: {
-                  phValue: avgData.avgPhValue,
-                  turbidity: avgData.avgTurbidity,
-                  temperature: avgData.avgTemperature,
-                  status: avgData.avgWaterStatus
-                }
-              });
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Image uploaded successfully.");
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Image upload failed.");
             });
-
-            console.log("构造的多天数据:", this.rawData);
-            this.drawAllCharts("day"); // 按天绘制图表
-          } catch (error) {
-            console.error(`获取前 ${days} 天数据失败`, error);
-          }
         }
+    </script>
+</head>
+<body>
 
-        ,
+    <h1>Upload Fish Image</h1>
+    
+    <label for="fishId">Fish ID:</label>
+    <input type="text" id="fishId" name="fishId" required><br><br>
 
-        /**
-         * 绘制所有图表
-         */
-        drawAllCharts(scale) {
-          this.charts.forEach(chart => {
-            this.updateChart(chart.id, scale);
-          });
-        },
+    <label for="imageInput">Select Image:</label>
+    <input type="file" id="imageInput" accept="image/*" required><br><br>
 
-        /**
-         * 更新单个图表
-         */
-        updateChart(chartId, scale) {
-          const xData = this.rawData.map(d => {
-            let date = new Date(d.date);
-            return scale === "hour"
-              ? `${date.getHours()}:00` // 小时刻度
-              : date.toISOString().split("T")[0]; // 天刻度
-          });
-
-          const chartObj = this.charts.find(c => c.id === chartId);
-          if (!chartObj) return;
-
-          let yData = this.rawData.map(d => {
-            return chartObj.key.split('.').reduce((obj, key) => obj[key], d);
-          });
-
-          let statusData = this.rawData.map(d => {
-            return chartObj.key.includes("fish") ? d.fish.status : d.waterQuality.status;
-          });
-
-          this.drawChart(chartId, chartObj.title, xData, yData, statusData);
-        },
-
-        /**
-         * 处理按钮点击，更新数据范围
-         */
-        handleRangeSelection(days) {
-          if (days === 1) {
-            this.fetchRecentData();
-          } else {
-            this.fetchDailyAverage(days);
-          }
-        },
-
-        /**
-         * 画图方法
-         */
-        drawChart(elementId, title, xData, yData, statusData) {
-          let myChart = echarts.init(document.getElementById(elementId));
-          let seriesData = yData.map((value, index) => ({
-            value: value,
-            itemStyle: { color: statusData[index] === 0 ? "blue" : "red" }
-          }));
-
-          let option = {
-            title: { text: title },
-            tooltip: { trigger: "axis" },
-            xAxis: { type: "category", data: xData },
-            yAxis: { type: "value" },
-            series: [{ name: title, type: "line", data: seriesData }]
-          };
-
-          myChart.setOption(option);
-        }
-      }
-    });
-  </script>
-
+    <button onclick="encodeImageToBase64()">Upload Image</button>
 
 </body>
-
 </html>

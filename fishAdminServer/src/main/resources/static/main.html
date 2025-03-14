@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <link rel="icon" href="imgs/Icon.png" type="image/x-icon">
-
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
@@ -17,43 +16,540 @@
     <!-- Your custom styles (optional) -->
     <link rel="stylesheet" href="css/main.css">
     <link href="css/main_tailwind.css" rel="stylesheet">
-    <!-- 引入 Element UI 的 CSS 文件 -->
+    <!-- Element UI -->
     <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
-    <!-- 引入 Element UI 的 JS 文件 -->
     <script src="element-ui/lib/index.js"></script>
     <title>欢迎！</title>
 </head>
 
 <body>
-<header class="header">
-    <img src="imgs/Icon.png" alt="Fish" title="渔网图标">
-    <h1>渔网</h1>
-</header>
+    <div id="app" class="flex flex-col w-screen h-screen items-center">
+        <header class="h-15 rounded-b-lg bg-cyan-50 flex place-content-center w-screen shadow-lg">
+            <div class="flex justify-center items-center">
+                <img src="imgs/Icon.png" alt="Fish" title="渔网图标" class="h-10 mr-3">
+                <h class="text-xl font-bold text-sky-900  text-center">渔网</h>
+            </div>
+        </header>
+        <div class="w-screen flex justify-start h-full ">
+            <div class="w-1/7 bg-white/30 rounded-2xl m-3 grid content-around backdrop-blur-md">
+                <div class="bg-sky-600/30 w-full  flex justify-center items-center rounded-xl">
+                    <div class="flex flex-col p-6  text-center w-full">
+                        <p class="text-xl font-mono text-blue-800 mt-2">{{ sys_date }}</p> <!-- 绑定 Vue 的 `time` -->
+                        <p class="text-xl font-mono text-blue-800 mt-2">{{ sys_time }}</p>
+                    </div>
+                </div>
 
-<div class="flex flex-row">
-    <div class="basis-3xs">01</div>
-    <div class="basis-2xs">02</div>
-    <div class="basis-xs">03</div>
-    <div class="basis-sm">04</div>
-</div>
-</body>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-<script src="js/axios-0.18.0.js"></script>
-<script>
+                <div class="bg-cyan-50 font-bold font-sans hover:bg-cyan-200 w-full h-10 flex justify-center items-center rounded-xl cursor-pointer"
+                    :class="{'bg-cyan-200': activeTab === 'view'}" @click="changeTab('view')">
+                    数据视图
+                </div>
+                <div class="bg-cyan-50 font-bold font-sans hover:bg-cyan-200 w-full h-10 flex justify-center items-center rounded-xl cursor-pointer"
+                    :class="{'bg-cyan-200': activeTab === 'table'}" @click="changeTab('table')">
+                    数据表格
+                </div>
+                <div class="bg-cyan-50 font-bold font-sans hover:bg-cyan-200 w-full h-10 flex justify-center items-center rounded-xl cursor-pointer"
+                    :class="{'bg-cyan-200': activeTab === 'pond'}" @click="changeTab('pond')">
+                    查看鱼塘
+                </div>
 
-    let app = new Vue({
-        el: "#RL",
-        mounted(){
-        },
-        data() {
-            return {
+            </div>
+            <div class="flex flex-col w-6/7 bg-white/30 rounded-2xl m-3 backdrop-blur-md">
+                <div class="bg-white/70 rounded-2xl p-4 w-full">
+                    <h2 class="text-lg font-bold text-center mb-2">实时数据</h2>
+                    <div v-if="fishWaterData">
+                        <div v-for="(item, index) in dataChecks" :key="index"
+                            class="flex items-center justify-between py-2 border-b h-9">
 
+                            <!-- 数据名称 + 值 -->
+                            <p class="text-gray-600 w-1/3">
+                                {{ getLabel(item.label) }}:
+                                <span :class="{'text-blue-600': !item.isError, 'text-red-600': item.isError}">
+                                    {{ item.value }} {{ getUnit(item.label) }}
+                                </span>
+                            </p>
+
+                            <!-- 最小值输入框 -->
+                            <div class="flex items-center w-1/3">
+                                <label class="text-gray-500 mr-2">最小值:</label>
+                                <input type="number" v-model="item.minValue"
+                                    class="border border-gray-300 rounded px-2 py-1 w-20 text-center" />
+                            </div>
+
+                            <!-- 最大值输入框 -->
+                            <div class="flex items-center w-1/3">
+                                <label class="text-gray-500 mr-2">最大值:</label>
+                                <input type="number" v-model="item.maxValue"
+                                    class="border border-gray-300 rounded px-2 py-1 w-20 text-center" />
+                            </div>
+                        </div>
+
+                        <button @click="updateDataCheck"
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mt-2 w-full mt-4">
+                            更新数据范围
+                        </button>
+                    </div>
+                </div>
+
+
+
+                <div class="rounded-2xl backdrop-blur-md grid grid-cols-1 gap-4 w-full overflow-auto my-3">
+                    <div v-if="activeTab === 'view'||activeTab === 'table'" class="flex justify-center mt-2 space-x-2">
+                        <button class="bg-blue-500 text-white px-3 py-1 rounded"
+                            @click="handleRangeSelection(1)">前24小时</button>
+                        <button class="bg-green-500 text-white px-3 py-1 rounded"
+                            @click="handleRangeSelection(7)">前7天</button>
+                        <input v-model="customDays" type="number" min="1"
+                            class="border rounded px-2 py-1 w-16 text-center" placeholder="天数">
+                        <button class="bg-purple-500 text-white px-3 py-1 rounded"
+                            @click="handleRangeSelection(customDays)">前{{
+                            customDays }}天</button>
+                    </div>
+                    <div v-if="activeTab === 'view'"
+                        class="flex flex-col w-6/7 bg-white/30 rounded-2xl m-3 backdrop-blur-md">
+                        <div v-for="(chart, index) in charts" :key="index"
+                            class="bg-white/70 rounded-2xl backdrop-blur-md w-full h-96 p-4">
+                            <div :id="chart.id" class="h-80"></div>
+                        </div>
+                    </div>
+
+                    <div v-if="activeTab === 'table'"
+                        class="flex flex-col w-6/7 bg-white/30 rounded-2xl m-3 backdrop-blur-md">
+                        <table class="w-full border-collapse border border-gray-300 text-center">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="border border-gray-300 px-4 py-2">速度</th>
+                                    <th class="border border-gray-300 px-4 py-2">大小</th>
+                                    <th class="border border-gray-300 px-4 py-2">pH 值</th>
+                                    <th class="border border-gray-300 px-4 py-2">浊度</th>
+                                    <th class="border border-gray-300 px-4 py-2">温度</th>
+                                    <th class="border border-gray-300 px-4 py-2">日期</th>
+                                    <th class="border border-gray-300 px-4 py-2">图片</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(data, index) in fishWaterDatas" :key="index">
+                                    <td class="border border-gray-300 px-4 py-2"
+                                        :class="{'text-red-500': data.speed.isError}">
+                                        {{ data.speed.value }}
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2"
+                                        :class="{'text-red-500': data.size.isError}">
+                                        {{ data.size.value }}
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2"
+                                        :class="{'text-red-500': data.phValue.isError}">
+                                        {{ data.phValue.value }}
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2"
+                                        :class="{'text-red-500': data.turbidity.isError}">
+                                        {{ data.turbidity.value }}
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2"
+                                        :class="{'text-red-500': data.temperature.isError}">
+                                        {{ data.temperature.value }}
+                                    </td>
+                                    <td class="border border-gray-300 px-4 py-2">{{ data.date }}</td>
+                                    <td class="border border-gray-300 px-4 py-2">
+                                        <span v-if="data.imageId == 0">暂时没图片</span>
+                                        <button v-else @click="showImageDialog(data.imageId)"
+                                            class="text-blue-500 underline">
+                                            查看图片
+                                        </button>
+
+                                        <!-- 图片弹窗 -->
+                                        <div v-if="showDialog"
+                                            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                            <div class="bg-white p-4 rounded-md shadow-lg">
+                                                <img :src="imageSrc" alt="图片预览" class="max-w-full max-h-96">
+                                                <button @click="showDialog = false"
+                                                    class="mt-2 px-4 py-2 bg-gray-300 rounded-md">关闭</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+
+                    </div>
+
+                    <div v-if="activeTab === 'pond'"
+                        class="flex flex-col w-6/7 bg-white/30 rounded-2xl m-3 backdrop-blur-md p-4">
+
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">水池监控</h2>
+
+                        <div v-if="!imageSrc" class="text-gray-500">暂时没图片</div>
+
+                        <div v-else class="relative">
+                            <img v-if="imageSrc" :src="imageSrc" alt="水池图片"
+                                class="w-full max-h-96 object-contain rounded-lg shadow-md">
+
+                            <!-- 如果没有加载完毕，显示加载中 -->
+                            <div v-if="loading"
+                                class="absolute inset-0 flex items-center justify-center bg-white/60 rounded-lg">
+                                <span class="text-gray-700">加载中...</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                ip: "http://localhost:8080",
+                imageSrc: "",
+                showDialog: false,
+                dataChecks: [],
+                activeTab: "view", // 默认显示数据视图
+                sys_date: "",
+                sys_time: "",
+                loading: false,
+                fishWaterDatas: [], // 存储原始数据
+                fishWaterData: {
+                    speed: {
+                        value: 0,
+                        isError: false
+                    },
+                    size: {
+                        value: 0,
+                        isError: false
+                    },
+                    phValue: {
+                        value: 0,
+                        isError: false
+                    },
+                    turbidity: {
+                        value: 0,
+                        isError: false
+                    },
+                    temperature: {
+                        value: 0,
+                        isError: false
+                    },
+                    date: "",
+                    imageId: 0
+                }, // 存储最近一条数据
+                customDays: 1,
+                intervalId: null, // 定时器 ID
+                charts: [
+                    { id: "chart-speed", title: "鱼速 (m/s)", key: "speed" },
+                    { id: "chart-size", title: "鱼体长 (cm)", key: "size" },
+                    { id: "chart-ph", title: "pH 值", key: "phValue" },
+                    { id: "chart-turbidity", title: "浊度", key: "turbidity" },
+                    { id: "chart-temperature", title: "温度 (°C)", key: "temperature" }
+                ]
+            },
+            mounted() {
+                this.updateTime();
+                setInterval(this.updateTime, 1000);
+                
+                this.fetchRecentData(); // 默认获取最近 24 小时数据
+                this.fetchLastOneData(); // 获取最近一条数据
+                this.fetchDataChecks();
+                setInterval(this.fetchImage, 60000);// 每 1 小时更新一次
+                this.intervalId = setInterval(this.fetchLastOneData, 600000); // 每 1 分钟更新一次
+            },
+            beforeDestroy() {
+                clearInterval(this.intervalId);
+            },
+            methods: {
+                async showImageDialog(imageId) {
+                    try {
+                        // 调用后端 API 获取 Base64 图片字符串
+                        const response = await fetch(this.ip + `/image/get/${imageId}`);
+                        const base64Image = await response.text(); // 直接获取 Base64 字符串
+
+                        // 转换成 data URL 格式
+                        this.imageSrc = base64Image;
+                        this.showDialog = true;
+                    } catch (error) {
+                        console.error("获取图片失败", error);
+                    }
+                },
+                getLabel(key) {
+                    const labels = {
+                        speed: "水流速度",
+                        size: "鱼体大小",
+                        phValue: "pH 值",
+                        turbidity: "浊度",
+                        temperature: "水温",
+                        date: "采集时间",
+                        imageId: "图片"
+                    };
+                    return labels[key] || key;
+                },
+                changeTab(tab) {
+                    this.activeTab = tab;
+                    if (tab === "view") {
+                        this.fetchRecentData(); // 默认获取最近 24 小时数据
+                    }
+                    else if (tab === "table") {
+                        this.fetchRecentData(); // 默认获取最近 24 小时数据
+                    } else if (tab === "pond") {
+                        fetchImage();
+                    }
+                },
+                updateTime() {
+                    const now = new Date();
+                    this.sys_date = now.toISOString().split("T")[0];
+                    this.sys_time = now.toTimeString().split(" ")[0].slice(0, 5);
+                },
+                async fetchImage() {
+                    this.loading = true;
+                    if (this.activeTab == "pond") {
+                        try {
+                        const response = await fetch(this.ip+`/image/recent`);
+                        const base64Image = await response.text();
+                        this.imageSrc = `${base64Image}`;
+                    } catch (error) {
+                        console.error("图片加载失败:", error);
+                        this.imageSrc = "";
+                    }
+                    this.loading = false;
+                    }
+                    
+                    
+                },
+                async fixData(outData, inData) {
+                    let dataCheck = inData.dataChecks.find(item => item.label === "speed");
+                    outData.speed.value = dataCheck.value;
+                    outData.speed.isError = dataCheck.isError;
+                    outData.size.value = inData.dataChecks.find(item => item.label === "size").value;
+                    outData.size.isError = inData.dataChecks.find(item => item.label === "size").isError;
+                    outData.phValue.value = inData.dataChecks.find(item => item.label === "phValue").value;
+                    outData.phValue.isError = inData.dataChecks.find(item => item.label === "phValue").isError;
+                    outData.turbidity.value = inData.dataChecks.find(item => item.label === "turbidity").value;
+                    outData.turbidity.isError = inData.dataChecks.find(item => item.label === "turbidity").isError;
+                    outData.temperature.value = inData.dataChecks.find(item => item.label === "temperature").value;
+                    outData.temperature.isError = inData.dataChecks.find(item => item.label === "temperature").isError;
+                    outData.date = inData.date;
+                    outData.imageId = inData.imageId;
+                },
+                async fixData(outData, inData) {
+                    let dataCheck = inData.dataChecks.find(item => item.label === "speed");
+                    outData.speed.value = dataCheck.value;
+                    outData.speed.isError = dataCheck.isError;
+                    outData.size.value = inData.dataChecks.find(item => item.label === "size").value;
+                    outData.size.isError = inData.dataChecks.find(item => item.label === "size").isError;
+                    outData.phValue.value = inData.dataChecks.find(item => item.label === "phValue").value;
+                    outData.phValue.isError = inData.dataChecks.find(item => item.label === "phValue").isError;
+                    outData.turbidity.value = inData.dataChecks.find(item => item.label === "turbidity").value;
+                    outData.turbidity.isError = inData.dataChecks.find(item => item.label === "turbidity").isError;
+                    outData.temperature.value = inData.dataChecks.find(item => item.label === "temperature").value;
+                    outData.temperature.isError = inData.dataChecks.find(item => item.label === "temperature").isError;
+                    outData.date = inData.date;
+                    outData.imageId = inData.imageId;
+                },
+                /**
+                 * 每分钟获取最新一条数据，并更新到实时数据
+                 */
+                async fetchLastOneData() {
+                    try {
+                        let response = await axios.get(this.ip + "/fishwater/recent");
+                        if (response.data.length > 0) {
+                            let data = response.data[response.data.length - 1]; // 取最后一条
+                            this.fixData(this.fishWaterData, data);
+                            this.dataChecks.find(item => item.label === "speed").value = this.fishWaterData.speed.value;
+                            this.dataChecks.find(item => item.label === "speed").isError = this.fishWaterData.speed.isError;
+                            this.dataChecks.find(item => item.label === "size").value = this.fishWaterData.size.value;
+                            this.dataChecks.find(item => item.label === "size").isError = this.fishWaterData.size.isError;
+                            this.dataChecks.find(item => item.label === "phValue").value = this.fishWaterData.phValue.value;
+                            this.dataChecks.find(item => item.label === "phValue").isError = this.fishWaterData.phValue.isError;
+                            this.dataChecks.find(item => item.label === "turbidity").value = this.fishWaterData.turbidity.value;
+                            this.dataChecks.find(item => item.label === "turbidity").isError = this.fishWaterData.turbidity.isError;
+                            this.dataChecks.find(item => item.label === "temperature").value = this.fishWaterData.temperature.value;
+                            this.dataChecks.find(item => item.label === "temperature").isError = this.fishWaterData.temperature.isError;
+                        }
+                    } catch (error) {
+                        console.error("获取最新数据失败", error);
+                    }
+                },
+
+                /**
+                 * 获取最近 24 小时的数据
+                 */
+                async fetchRecentData() {
+                    try {
+                        let response = await axios.get(this.ip + "/fishwater/recent");
+                        let datas = response.data;
+                        console.log("获取的最近 24 小时数据:", datas);
+                        this.fishWaterDatas = [];
+                        for (let i = 0; i < datas.length; i++) {
+                            let fishwater = {
+                                speed: { value: 0, isError: false },
+                                size: { value: 0, isError: false },
+                                phValue: { value: 0, isError: false },
+                                turbidity: { value: 0, isError: false },
+                                temperature: { value: 0, isError: false },
+                                date: "",
+                                imageId: 0
+                            };
+                            this.fixData(fishwater, datas[i]);
+                            this.fishWaterDatas.push(fishwater);
+                        }
+                        console.log("构造的 24 小时数据:", this.fishWaterDatas);
+                        if (this.activeTab === "view") {
+                            this.drawAllCharts("hour"); // 刻度设为小时
+                        }
+                    } catch (error) {
+                        console.error("获取最近 24 小时数据失败", error);
+                    }
+                },
+
+                /**
+                 * 获取前 n 天的每日平均数据
+                 */
+                async fetchDailyAverage(days) {
+                    try {
+                        let response = await axios.get(this.ip + `/fishwater/dailyAverage/${days}`);
+                        let datas = response.data; // 确保返回的是数组
+
+                        // 先清空 `fishWaterDatas`，防止数据重复
+                        this.fishWaterDatas = [];
+                        for (let i = 0; i < datas.length; i++) {
+                            let fishwater = {
+                                speed: { value: 0, isError: false },
+                                size: { value: 0, isError: false },
+                                phValue: { value: 0, isError: false },
+                                turbidity: { value: 0, isError: false },
+                                temperature: { value: 0, isError: false },
+                                date: "",
+                                imageId: ""
+                            };
+                            this.fixData(fishwater, datas[i]);
+                            this.fishWaterDatas.push(fishwater);
+                        }
+                        if (this.activeTab === "view") {
+                            this.drawAllCharts("day"); // 按天绘制图表
+                        }
+                    } catch (error) {
+                        console.error(`获取前 ${days} 天数据失败`, error);
+                    }
+                }
+
+                ,
+
+                /**
+                 * 绘制所有图表
+                 */
+                drawAllCharts(scale) {
+                    this.charts.forEach(chart => {
+                        this.updateChart(chart.id, scale);
+                    });
+                },
+
+                /**
+                 * 更新单个图表
+                 */
+                updateChart(chartId, scale) {
+                    let rawData = this.fishWaterDatas;
+                    const xData = rawData.map(d => {
+                        let date = new Date(d.date);
+                        return scale === "hour"
+                            ? `${date.getHours()}:00` // 小时刻度
+                            : date.toISOString().split("T")[0]; // 天刻度
+                    });
+                    const chartObj = this.charts.find(c => c.id === chartId);
+                    if (!chartObj) return;
+
+                    let yData = rawData.map(d => {
+                        return chartObj.key.split('.').reduce((obj, key) => obj[key], d).value;
+                    });
+
+                    let statusData = rawData.map(d => {
+                        return chartObj.key.split('.').reduce((obj, key) => obj[key], d).isError;
+                    });
+                    this.drawChart(chartId, chartObj.title, xData, yData, statusData);
+                },
+
+
+                /**
+                 * 处理按钮点击，更新数据范围
+                 */
+                handleRangeSelection(days) {
+                    if (days === 1) {
+                        this.fetchRecentData();
+                    } else {
+                        this.fetchDailyAverage(days);
+                    }
+                },
+
+                /**
+                 * 画图方法
+                 */
+                drawChart(elementId, title, xData, yData, statusData) {
+                    let myChart = echarts.init(document.getElementById(elementId));
+                    let seriesData = yData.map((value, index) => ({
+                        value: value,
+                        itemStyle: { color: statusData[index] === false ? "blue" : "red" }
+                    }));
+
+                    let option = {
+                        title: { text: title },
+                        tooltip: { trigger: "axis" },
+                        xAxis: { type: "category", data: xData },
+                        yAxis: { type: "value" },
+                        series: [{ name: title, type: "line", data: seriesData }]
+                    };
+
+                    myChart.setOption(option);
+                },
+                async fetchDataChecks() {
+                    try {
+                        const response = await fetch(this.ip + "/datacheck/datachecks");
+                        this.dataChecks = await response.json();
+                    } catch (error) {
+                        console.error("数据获取失败", error);
+                    }
+                },
+                async updateDataCheck() {
+                    try {
+                        await fetch(this.ip + "/datacheck/update", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(this.dataChecks),
+                        });
+                        alert("数据范围更新成功！");
+                    } catch (error) {
+                        console.error("数据更新失败", error);
+                    }
+                },
+                getLabel(key) {
+                    const labels = {
+                        phValue: "pH 值",
+                        size: "鱼体长",
+                        speed: "鱼速",
+                        temperature: "温度",
+                        turbidity: "浊度",
+                    };
+                    return labels[key] || key;
+                },
+                getUnit(key) {
+                    const units = {
+                        phValue: "",
+                        size: "cm",
+                        speed: "m/s",
+                        temperature: "°C",
+                        turbidity: "",
+                    };
+                    return units[key] || "";
+                },
             }
-        },
-        methods: {
+        });
+    </script>
 
-        }
-    });
-</script>
+
+</body>
 
 </html>
