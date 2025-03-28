@@ -1,4 +1,4 @@
-fish_terminal/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
+fish_terminal/systick.o: ..\Core\Src\systick.c ..\Core\Inc\systick.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h \
   ..\Core\Inc\stm32f1xx_hal_conf.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rcc.h \
@@ -30,19 +30,4 @@ fish_terminal/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_pwr.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_tim.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_tim_ex.h \
-  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_uart.h \
-  ..\Middlewares\Third_Party\RealThread_RTOS\include\rtthread.h \
-  ..\RT-Thread\rtconfig.h \
-  ..\Middlewares\Third_Party\RealThread_RTOS\include\rtdebug.h \
-  ..\Middlewares\Third_Party\RealThread_RTOS\include\rtdef.h \
-  D:\software\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdarg.h \
-  ..\Middlewares\Third_Party\RealThread_RTOS\include\rtservice.h \
-  ..\Middlewares\Third_Party\RealThread_RTOS\finsh\finsh_api.h \
-  ..\Middlewares\Third_Party\RealThread_RTOS\finsh\finsh_config.h \
-  ..\Core\Inc\adc.h ..\Core\Inc\i2c.h ..\Core\Inc\usart.h \
-  ..\Core\Inc\gpio.h ..\Core\Inc\esp01s.h ..\Core\Inc\tds.h \
-  ..\Core\Inc\global.h \
-  D:\software\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
-  D:\software\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
-  D:\software\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h \
-  ..\Core\Inc\oled.h
+  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_uart.h

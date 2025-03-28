@@ -396,6 +396,16 @@
           <GroupName>Application/User/Core</GroupName>
           <Files>
             <File>
+              <FileName>globals.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\globals.c</FilePath>
+            </File>
+            <File>
+              <FileName>systick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\systick.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/main.c</FilePath>
@@ -434,11 +444,6 @@
               <FileName>stm32f1xx_hal_timebase_tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f1xx_hal_timebase_tim.c</FilePath>
-            </File>
-            <File>
-              <FileName>globals.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\globals.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1553,6 +1558,36 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>WIFI</GroupName>
+          <Files>
+            <File>
+              <FileName>esp01s.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\esp01s.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OLED</GroupName>
+          <Files>
+            <File>
+              <FileName>oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\oled.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>TDS</GroupName>
+          <Files>
+            <File>
+              <FileName>tds.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\tds.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>Middlewares/RT-Thread/RTOS/shell</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1847,26 +1882,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>WIFI</GroupName>
-          <Files>
-            <File>
-              <FileName>esp01s.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\esp01s.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>OLED</GroupName>
-          <Files>
-            <File>
-              <FileName>oled.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\oled.c</FilePath>
             </File>
           </Files>
         </Group>
