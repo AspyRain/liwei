@@ -65,12 +65,16 @@ void get_ph(void *prmt);
 void get_turbidity(void *prmt);
 void oled_menu(void *prmt);
 void data_controller(void *prmt);
-
+void clearUsart();
+void TDS_Value_Conversion();
+void reciveData();
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define PH_IN0_Pin GPIO_PIN_0
 #define PH_IN0_GPIO_Port GPIOA
+#define TDS_INO_Pin GPIO_PIN_1
+#define TDS_INO_GPIO_Port GPIOA
 #define WIFI_TX_Pin GPIO_PIN_2
 #define WIFI_TX_GPIO_Port GPIOA
 #define WIFI_RX_Pin GPIO_PIN_3
@@ -83,10 +87,6 @@ void data_controller(void *prmt);
 #define FISH_TX_GPIO_Port GPIOB
 #define FISH_RX_Pin GPIO_PIN_11
 #define FISH_RX_GPIO_Port GPIOB
-#define TDS_TX_Pin GPIO_PIN_9
-#define TDS_TX_GPIO_Port GPIOA
-#define TDS_RX_Pin GPIO_PIN_10
-#define TDS_RX_GPIO_Port GPIOA
 #define OLED_SCL_Pin GPIO_PIN_6
 #define OLED_SCL_GPIO_Port GPIOB
 #define OLED_SDA_Pin GPIO_PIN_7

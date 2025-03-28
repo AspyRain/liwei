@@ -6,7 +6,12 @@
 #define NUM_FLAGS 6  // 定义标志位的数量
 extern int is_Change[NUM_FLAGS] ;
 
+struct Point {
+    int x;  // x 坐标
+    int y;  // y 坐标
+};
 
+extern struct Point index[4][7];  // 声明二维数组
 	
 void WriteCmd(void);
 //向设备写控制命令
