@@ -28,6 +28,12 @@
 #include <rtthread.h>
 #include "esp01s.h"
 #include <stdint.h>
+#include "tds.h"
+#include "global.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "oled.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,6 +54,22 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+extern ADC_HandleTypeDef hadc2; // 确保 ADC 句柄全局可用
+char usart2_c;
+int dataLen;
+char dataLenStr[dataMaxLen];
+float ADC_ConvertedValueLocal[3] = {0};
+uint16_t ADC_ConvertedValue[3] = {0}; 
+float compensationCoefficient, compensationVolatge, TDS_value;
+float kValue = 1.0;  // 传感器校准系�?
+char  TEMP_Buff[5];   //温度存放数组
+char  TDS_Buff[6];   //TDS存放数组
+float TEMP_Value=0.0;
+float PH_Value=0.0;
+float TDS_Value=0.0;
+float SIZE_Value=0.0;
+float SPEED_Value=0.0;
+char *realCommand;
 
 /* USER CODE END PV */
 
@@ -86,7 +108,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+	
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -96,18 +118,21 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
+  MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
-  rt_thread_t ph_task = rt_thread_begin("ph_task", 
-                                              get_ph, RT_NULL,
-                                              1024, 3, 10);
+	
+	HAL_UART_Receive_IT(&huart2, (uint8_t *)&usart2_c, 1);
+  // rt_thread_t ph_task = rt_thread_begin("ph_task", 
+  //                                            get_ph, RT_NULL,
+  //                                            1024, 3, 10);
 
-  rt_thread_t turbidity_task = rt_thread_begin("turbidity_task", 
-                                            get_turbidity, RT_NULL,
-                                            1024, 3, 10);
+  // rt_thread_t turbidity_task = rt_thread_begin("turbidity_task", 
+  //                                          get_turbidity, RT_NULL,
+  //                                          1024, 3, 10);
                     
-  rt_thread_t oled_task = rt_thread_begin("oled_task", 
-                                            oled_menu, RT_NULL,
-                                            1024, 3, 10);
+  // rt_thread_t oled_task = rt_thread_begin("oled_task", 
+  //                                          oled_menu, RT_NULL,
+  //                                          1024, 3, 10);
   
   rt_thread_t data_controller_task = rt_thread_begin("data_controller_task", 
                                             data_controller, RT_NULL,
@@ -119,7 +144,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+		rt_thread_mdelay(10);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -191,7 +216,7 @@ rt_thread_t rt_thread_begin(const char *name,
   }
 
 }
-//获取ph值
+//获取ph�??
 void get_ph(void *prmt){
 	while (1)
   {
@@ -201,30 +226,228 @@ void get_ph(void *prmt){
   
 }
 
-//获取浑浊度/温度
+//获取浑浊�??/温度
 void get_turbidity(void *prmt){
 	while (1)
   {
+		// TEMP_Value=DS18B20_Get_Temp();
+	  // TEMP_Buff[0]=(int)(TEMP_Value)%1000/100+'0';	
+	  // TEMP_Buff[1]=(int)(TEMP_Value)%100/10+'0';
+	  // TEMP_Buff[2]='.';
+	  // TEMP_Buff[3]=(int)(TEMP_Value)%10+'0';
     rt_kprintf("正在运行:getturbidity\n");
     rt_thread_mdelay(1500);
   }
 }
 
-//oled显示屏
+//oled显示�??
 void oled_menu(void *prmt){
+  OLED_Init();
+  OLED_Clear();
+  OLED_ShowStart();
+
+  rt_thread_mdelay(1000);
+  OLED_Clear();
+  OLED_ShowCHinese( index[0][0].x, index[0][0].y, 10);//温
+  OLED_ShowCHinese( index[0][1].x, index[0][1].y, 13);//度
+  OLED_ShowChar(    index[0][2].x, index[0][2].y, ':', 16);
+
+  OLED_ShowCHinese(index[1][0].x, index[1][0].y, 11);//混
+  OLED_ShowCHinese(index[1][1].x, index[1][1].y, 12);//浊
+  OLED_ShowCHinese(index[1][2].x, index[1][2].y, 13);//度
+  OLED_ShowChar(    index[1][3].x, index[1][3].y, ':', 16);
+
+  OLED_ShowString(index[2][0].x,index[2][0].y,"PH",16);//PH
+  OLED_ShowChar(    index[2][1].x, index[2][1].y, ':', 16);
+
+  OLED_ShowCHinese( index[3][0].x, index[3][0].y, 14);//尺
+  OLED_ShowCHinese( index[3][1].x, index[3][1].y, 15);//度寸
+
+
+  OLED_ShowCHinese( index[3][4].x, index[3][4].y, 0);//温
+  OLED_ShowCHinese( index[3][5].x, index[3][5].y, 16);//度
+
+
 	while (1)
   {
+
+    char tempStr[10]; // 用来存放格式化后的字符串
+    // 格式化浮点数，保留一位小数
+    sprintf(tempStr, "%.1f", TEMP_Value);
+    // 显示字符串
+    OLED_ShowString(index[0][3].x, index[0][3].y, tempStr, 16); // 假设显示在 (0, 0) 位置，使用16号字体
+
+    char TDSStr[10]; // 用来存放格式化后的字符串
+    // 格式化浮点数，保留一位小数
+    sprintf(TDSStr, "%.1f", TDS_Value);
+    // 显示字符串
+    OLED_ShowString(index[1][4].x, index[1][4].y, TDSStr, 16); // 假设显示在 (0, 0) 位置，使用16号字体
+
+
+
+    char phStr[10]; // 用来存放格式化后的字符串
+    // 格式化浮点数，保留一位小数
+    sprintf(phStr, "%.1f", PH_Value);
+    // 显示字符串
+    OLED_ShowString(index[2][2].x, index[2][2].y, phStr, 16); // 假设显示在 (0, 0) 位置，使用16号字体
+
+    char SIZEStr[10]; // 用来存放格式化后的字符串
+    // 格式化浮点数，保留一位小数
+    sprintf(SIZEStr, "%.1f", SIZE_Value);
+    // 显示字符串
+    OLED_ShowString(index[3][2].x, index[3][2].y, SIZEStr, 15); // 假设显示在 (0, 0) 位置，使用16号字体
+
+    char SPEEDStr[10]; // 用来存放格式化后的字符串
+    // 格式化浮点数，保留一位小数
+    sprintf(SPEEDStr, "%.1f", SPEED_Value);
+    // 显示字符串
+    OLED_ShowString(index[3][6].x, index[3][6].y, SPEEDStr, 15); // 假设显示在 (0, 0) 位置，使用16号字体
+
     rt_kprintf("正在运行:oled\n");
     rt_thread_mdelay(1000);
   }
 }
-//数据控制器 - wifi通信
+//数据控制�?? - wifi通信
 void data_controller(void *prmt){
-  // wifi初始化
-	while (1)
+  // wifi初始�??
+	Esp01s_Init("AspyRain", "[FrommetoU]", "192.168.70.191",8888);
+	while (esp_flag)
   {
-    rt_kprintf("正在运行:wifi通信\n");
+    char buffer[100];  // 预留足够的空间存放字符串
+
+    // 格式化字符串，保留一位小数
+    sprintf(buffer, "data:%.1f,%.1f,%.1f,%.1f,%.1f\n", 
+            TEMP_Value, PH_Value, TDS_Value, SIZE_Value, SPEED_Value);
+
+    // 打印结果
+    rt_kprintf("发送数据%s\n", buffer);
+    espSend(buffer,0);
+		rt_kprintf("正在运行:wifi通信\n");
     rt_thread_mdelay(2000);
+	}
+    
+}
+
+void TDS_Value_Conversion()
+{
+    // 1️⃣ 读取 ADC 电压（HAL 方式�?
+    HAL_ADC_Start(&hadc2);
+    HAL_ADC_PollForConversion(&hadc2, 10);
+    ADC_ConvertedValue[0] = HAL_ADC_GetValue(&hadc2);
+    HAL_ADC_Stop(&hadc2);
+
+    ADC_ConvertedValueLocal[0] = (float)ADC_ConvertedValue[0] / 4096 * 3.3; // AD 转换
+
+    // 2️⃣ 读取温度（如果使用内部温度传感器，可�? ADC 采集�?
+    float TEMP_Value = 25.0; // 默认 25°C，如有温度传感器可替�?
+
+    // 3️⃣ 计算温度补偿系数
+    compensationCoefficient = 1.0 + 0.02 * (TEMP_Value - 25.0);
+    compensationVolatge = ADC_ConvertedValueLocal[0] / compensationCoefficient;
+
+    // 4️⃣ TDS 计算
+    if (ADC_ConvertedValueLocal[0] >= 0 && ADC_ConvertedValueLocal[0] < 0.1)
+    {
+        compensationVolatge = 0;
+    }
+
+    TDS_value = (133.42 * compensationVolatge * compensationVolatge * compensationVolatge
+                 - 255.86 * compensationVolatge * compensationVolatge
+                 + 857.39 * compensationVolatge) * 0.5 * kValue;
+
+    // 5️⃣ 限制 TDS 范围
+    if (TDS_value <= 0) { TDS_value = 0; }
+    if (TDS_value > 1400) { TDS_value = 1400; }
+
+    // 6️⃣ 格式化输�?
+    TDS_Buff[0] = (int)(TDS_value) / 1000 + '0';
+    TDS_Buff[1] = (int)(TDS_value) % 1000 / 100 + '0';
+    TDS_Buff[2] = (int)(TDS_value * 100) % 100 / 10 + '0';
+    TDS_Buff[3] = (int)(TDS_value * 100) % 10 + '0';
+}
+
+void clearUsart()
+{
+  memset(usart2_rx_buffer, 0, sizeof(usart2_rx_buffer));
+  usart2_rx_index = 0;
+}
+
+void reciveData()
+{
+  if (usart2_rx_index == -1)
+    usart2_rx_index++;
+  else
+  {
+    switch (esp_command_flag)
+    {
+    case 1:
+
+      if (usart2_rx_index < dataMaxLen)
+      {
+        dataLenStr[usart2_rx_index++] = usart2_c;
+      }
+      else
+      {
+        rt_kprintf("data too long!\n");
+      }
+      break;
+    case 2:
+
+      if (usart2_rx_index < dataLen)
+      {
+        realCommand[usart2_rx_index++] = usart2_c;
+      }
+      else
+      {
+        rt_kprintf("data error!\n");
+      }
+      break;
+    default:
+      usart2_rx_buffer[usart2_rx_index++] = usart2_c;
+      break;
+    }
+  }
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart == &huart2)
+  {
+    if (esp_command_flag == 3)
+      esp_command_flag = 0;
+    if (usart2_rx_index >= BUFFER_SIZE - 1)
+    {
+      clearUsart();
+    }
+    if (usart2_c == '\n'){
+      rt_kprintf("%s",usart2_rx_buffer);
+    }
+    // if (esp_flag == 1)
+    // {
+    //   if (usart2_c == '+')
+    //   {
+    //     clearUsart();
+    //   }
+    //   else if (strstr((const char *)usart2_rx_buffer, "+IPD,0,") != NULL) // ???????,????????
+    //   {
+    //     // ???????
+    //     esp_command_flag = 1;
+    //     // ???????,?????????
+    //     clearUsart();
+    //   }
+    //   else if (esp_command_flag == 1 && usart2_c == ':') // ??????
+    //   {
+    //     esp_command_flag = 2;
+    //     dataLen = atoi(dataLenStr);
+    //     usart2_rx_index = -1;
+    //     memset(dataLenStr, 0, sizeof(dataLenStr));
+    //     realCommand = (char *)malloc((dataLen * sizeof(char)) + 1);
+    //     realCommand[dataLen] = '\0';
+    //   }
+    //}
+    reciveData();
+    // ?????????
+    HAL_UART_Receive_IT(&huart2, (uint8_t *)&usart2_c, 1);
   }
 }
 /* USER CODE END 4 */
