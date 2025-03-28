@@ -5,6 +5,13 @@
 
 // 几个变量声明
 
+struct Point index[4][7] = {
+    {{4, 0}, {20, 0}, {36, 0}, {52, 0}, {68, 0}, {84, 0}, {100, 0}},  // 第一行：y=0，x依次增加
+    {{4, 2}, {20, 2}, {36, 2}, {52, 2}, {68, 2}, {84, 2}, {100, 2}},  // 第二行：y=2，x依次增加
+    {{4, 4}, {20, 4}, {36, 4}, {52, 4}, {68, 4}, {84, 4}, {100, 4}},  // 第三行：y=4，x依次增加
+    {{4, 6}, {20, 6}, {36, 6}, {52, 6}, {68, 6}, {84, 6}, {100, 6}}   // 第四行：y=6，x依次增加
+};
+
 // 初始化命令
 uint8_t CMD_Data[] = {
 	0xAE, 0x00, 0x10, 0x40, 0xB0, 0x81, 0xFF, 0xA1, 0xA6, 0xA8, 0x3F,
@@ -196,23 +203,23 @@ void OLED_ShowCHinese(uint8_t x, uint8_t y, uint8_t no)
 
 void OLED_ShowStart()
 {
-    OLED_ShowCHinese(0, 0, 6);   // 飞
-    OLED_ShowCHinese(16, 0, 7);  // 禽
-    OLED_ShowCHinese(32, 0, 8);  // 智
-    OLED_ShowCHinese(48, 0, 9);  // 能
-    OLED_ShowCHinese(64, 0, 10); // 投
-    OLED_ShowCHinese(80, 0, 11); // 喂
-    OLED_ShowCHinese(96, 0, 12); // 系
-    OLED_ShowCHinese(112, 0, 13); // 统
+
+    OLED_ShowCHinese(index[0][0].x, index[0][0].y, 0);   // 鱼
+    OLED_ShowCHinese(index[0][1].x, index[0][1].y, 1);  // 塘
+    OLED_ShowCHinese(index[0][2].x, index[0][2].y, 2);  // 养
+    OLED_ShowCHinese(index[0][3].x, index[0][3].y, 3);  // 殖
+    OLED_ShowCHinese(index[0][4].x, index[0][4].y, 4); // 系
+    OLED_ShowCHinese(index[0][5].x, index[0][5].y, 5); // 统
+
 	
 	
-	OLED_ShowCHinese(0,5,14);//初
-	OLED_ShowCHinese(16,5,15);//始
-	OLED_ShowCHinese(32,5,16);//化
-	OLED_ShowCHinese(48,5,17);//中
-	OLED_ShowChar(64, 5, '.', 16);
-    OLED_ShowChar(80, 5, '.', 16);
-    OLED_ShowChar(96, 5, '.', 16);
+	OLED_ShowCHinese(index[2][0].x,index[2][0].y,6);//初
+	OLED_ShowCHinese(index[2][1].x,index[2][1].y,7);//始
+	OLED_ShowCHinese(index[2][2].x,index[2][2].y,8);//化
+	OLED_ShowCHinese(index[2][3].x,index[2][3].y,9);//中
+	OLED_ShowChar(index[2][4].x, index[2][4].y, '.', 16);
+    OLED_ShowChar(index[2][5].x, index[2][5].y, '.', 16);
+    OLED_ShowChar(index[2][6].x, index[2][6].y, '.', 16);
 	
 }
 
