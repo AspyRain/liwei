@@ -1,14 +1,13 @@
 package com.fishadminserver.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 @Data
 @Entity
 @Table(name = "wqrecords")  // 指定表名
 public class WaterQualityRecords {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private float phValue;
     private float turbidity;

@@ -11,6 +11,7 @@ import lombok.Data;
 public class FishRecords {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private float speed;
