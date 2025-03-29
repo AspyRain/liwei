@@ -18,14 +18,39 @@ void SysTick_Init(void)
   * @param  us: 延时时间 (微秒)
   * @retval 无
   */
- void delay_us(uint32_t us)
+ #define CPU_FREQUENCY_MHZ    72		// STM32时钟主频
+ void delay_us(__IO uint32_t delay)
  {
-     uint32_t delay = (HAL_RCC_GetHCLKFreq() / 4000000 * us);
-     while (delay--)
-   {
-     ;
-   }
- } 
+     int last, curr, val;
+     int temp;
+ 
+     while (delay != 0)
+     {
+         temp = delay > 900 ? 900 : delay;
+         last = SysTick->VAL;
+         curr = last - CPU_FREQUENCY_MHZ * temp;
+         if (curr >= 0)
+         {
+             do
+             {
+                 val = SysTick->VAL;
+             }
+             while ((val < last) && (val >= curr));
+         }
+         else
+         {
+             curr += CPU_FREQUENCY_MHZ * 1000;
+             do
+             {
+                 val = SysTick->VAL;
+             }
+             while ((val <= last) || (val > curr));
+         }
+         delay -= temp;
+     }
+ }
+ 
+ 
 
 /**
   * @brief  毫秒级延时
