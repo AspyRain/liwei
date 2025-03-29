@@ -126,13 +126,13 @@ int main(void)
   //                                            get_ph, RT_NULL,
   //                                            1024, 3, 10);
 
-  // rt_thread_t turbidity_task = rt_thread_begin("turbidity_task", 
-  //                                          get_turbidity, RT_NULL,
-  //                                          1024, 3, 10);
+  rt_thread_t turbidity_task = rt_thread_begin("turbidity_task", 
+                                           get_turbidity, RT_NULL,
+                                           1024, 3, 10);
                     
-  // rt_thread_t oled_task = rt_thread_begin("oled_task", 
-  //                                          oled_menu, RT_NULL,
-  //                                          1024, 3, 10);
+  rt_thread_t oled_task = rt_thread_begin("oled_task", 
+                                           oled_menu, RT_NULL,
+                                           1024, 3, 10);
   
   rt_thread_t data_controller_task = rt_thread_begin("data_controller_task", 
                                             data_controller, RT_NULL,
@@ -145,6 +145,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 		rt_thread_mdelay(10);
+    
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -216,7 +217,7 @@ rt_thread_t rt_thread_begin(const char *name,
   }
 
 }
-//获取ph�??
+//获取ph值
 void get_ph(void *prmt){
 	while (1)
   {
@@ -226,21 +227,22 @@ void get_ph(void *prmt){
   
 }
 
-//获取浑浊�??/温度
+//获取浑浊度/温度
 void get_turbidity(void *prmt){
+  DS18B20_Init();
 	while (1)
   {
-		// TEMP_Value=DS18B20_Get_Temp();
-	  // TEMP_Buff[0]=(int)(TEMP_Value)%1000/100+'0';	
-	  // TEMP_Buff[1]=(int)(TEMP_Value)%100/10+'0';
-	  // TEMP_Buff[2]='.';
-	  // TEMP_Buff[3]=(int)(TEMP_Value)%10+'0';
+		TEMP_Value=DS18B20_Get_Temp();
+	  TEMP_Buff[0]=(int)(TEMP_Value)%1000/100+'0';	
+	  TEMP_Buff[1]=(int)(TEMP_Value)%100/10+'0';
+	  TEMP_Buff[2]='.';
+	  TEMP_Buff[3]=(int)(TEMP_Value)%10+'0';
     rt_kprintf("正在运行:getturbidity\n");
-    rt_thread_mdelay(1500);
+    rt_thread_mdelay(10000);
   }
 }
 
-//oled显示�??
+//oled显示
 void oled_menu(void *prmt){
   OLED_Init();
   OLED_Clear();
@@ -307,9 +309,9 @@ void oled_menu(void *prmt){
     rt_thread_mdelay(1000);
   }
 }
-//数据控制�?? - wifi通信
+//数据控制- wifi通信
 void data_controller(void *prmt){
-  // wifi初始�??
+  // wifi初始化??
 	Esp01s_Init("AspyRain", "[FrommetoU]", "192.168.70.191",8888);
 	while (esp_flag)
   {

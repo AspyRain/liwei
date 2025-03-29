@@ -610,6 +610,7 @@ rt_err_t rt_thread_mdelay(rt_int32_t ms)
     return rt_thread_sleep(tick);
 }
 
+
 /**
  * This function will control thread behaviors according to control command.
  *

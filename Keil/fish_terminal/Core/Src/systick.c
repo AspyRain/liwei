@@ -18,13 +18,14 @@ void SysTick_Init(void)
   * @param  us: 延时时间 (微秒)
   * @retval 无
   */
-void Delay_us(uint32_t us)
-{
-    uint32_t start = DWT->CYCCNT;  // 获取当前 CPU 周期计数
-    uint32_t ticks = (SystemCoreClock / 1000000) * us; // 计算微秒对应的时钟周期数
-
-    while ((DWT->CYCCNT - start) < ticks); // 轮询等待
-}
+ void delay_us(uint32_t us)
+ {
+     uint32_t delay = (HAL_RCC_GetHCLKFreq() / 4000000 * us);
+     while (delay--)
+   {
+     ;
+   }
+ } 
 
 /**
   * @brief  毫秒级延时

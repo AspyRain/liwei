@@ -1,2 +1,46 @@
-Load "fish_terminal\\fish_terminal.axf" 
-Erase Done.Programming Done.Verify OK.Flash Load finished at 03:45:46
+*** Using Compiler 'V6.18', folder: 'D:\software\Keil5\ARM\ARMCLANG\Bin'
+Build target 'fish_terminal'
+compiling tds.c...
+../Core/Src/main.c(262): warning: passing 'char[3]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+  OLED_ShowString(index[2][0].x,index[2][0].y,"PH",16);//PH
+                                              ^~~~
+../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
+void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
+                                                  ^
+../Core/Src/main.c(280): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+    OLED_ShowString(index[0][3].x, index[0][3].y, tempStr, 16); // 假设显示在 (0, 0) 位置，使用16号字体
+                                                  ^~~~~~~
+../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
+void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
+                                                  ^
+../Core/Src/main.c(286): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+    OLED_ShowString(index[1][4].x, index[1][4].y, TDSStr, 16); // 假设显示在 (0, 0) 位置，使用16号字体
+                                                  ^~~~~~
+../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
+void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
+                                                  ^
+../Core/Src/main.c(294): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+    OLED_ShowString(index[2][2].x, index[2][2].y, phStr, 16); // 假设显示在 (0, 0) 位置，使用16号字体
+                                                  ^~~~~
+../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
+void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
+                                                  ^
+../Core/Src/main.c(300): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+    OLED_ShowString(index[3][2].x, index[3][2].y, SIZEStr, 15); // 假设显示在 (0, 0) 位置，使用16号字体
+                                                  ^~~~~~~
+../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
+void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
+                                                  ^
+../Core/Src/main.c(306): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+    OLED_ShowString(index[3][6].x, index[3][6].y, SPEEDStr, 15); // 假设显示在 (0, 0) 位置，使用16号字体
+                                                  ^~~~~~~~
+../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
+void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
+                                                  ^
+6 warnings generated.
+compiling main.c...
+linking...
+Program Size: Code=40568 RO-data=4420 RW-data=1400 ZI-data=18912  
+FromELF: creating hex file...
+"fish_terminal\fish_terminal.axf" - 0 Error(s), 6 Warning(s).
+Build Time Elapsed:  00:00:01

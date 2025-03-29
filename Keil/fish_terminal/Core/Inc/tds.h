@@ -11,7 +11,7 @@
 #define DS18B20_DATA_OUT(value) HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, (value) ? GPIO_PIN_SET : GPIO_PIN_RESET)
 #define DS18B20_DATA_IN() HAL_GPIO_ReadPin(DS18B20_PORT, DS18B20_PIN)
 
-void DS18B20_Init(void);
+uint8_t DS18B20_Init(void);
 float DS18B20_Get_Temp(void);
 
 #endif /* __TDS_H */
