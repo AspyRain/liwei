@@ -29,7 +29,7 @@
 #include <rtthread.h>
 #include "esp01s.h"
 #include <stdint.h>
-#include "tds.h"
+#include "ds18b20.h"
 #include "global.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,7 +62,7 @@ char dataLenStr[dataMaxLen];
 float ADC_ConvertedValueLocal[3] = {0};
 uint16_t ADC_ConvertedValue[3] = {0}; 
 float compensationCoefficient, compensationVolatge, TDS_value;
-float kValue = 1.0;  // 传感器校准系�???
+float kValue = 1.0;  // 传感器校准系�???
 char  TEMP_Buff[5];   //温度存放数组
 char  TDS_Buff[6];   //TDS存放数组
 float TEMP_Value=0.0;
@@ -146,7 +146,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    rt_thread_mdelay(20);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -221,7 +221,7 @@ rt_thread_t rt_thread_begin(const char *name,
   }
 
 }
-//获取ph�??
+//获取ph�??
 void get_ph(void *prmt){
 	while (1)
   {
@@ -231,12 +231,13 @@ void get_ph(void *prmt){
   
 }
 
-//获取浑浊�??/温度
+//获取浑浊�??/温度
 void get_turbidity(void *prmt){
-  DS18B20_Init();
 	while (1)
   {
-		TEMP_Value=DS18B20_Get_Temp();
+    DS18B20_StartConv();
+    rt_thread_mdelay(1000);
+		TEMP_Value=DS18B20_GetTemp();
 	  TEMP_Buff[0]=(int)(TEMP_Value)%1000/100+'0';	
 	  TEMP_Buff[1]=(int)(TEMP_Value)%100/10+'0';
 	  TEMP_Buff[2]='.';
@@ -254,60 +255,60 @@ void oled_menu(void *prmt){
 
   rt_thread_mdelay(1000);
   OLED_Clear();
-  OLED_ShowCHinese( index[0][0].x, index[0][0].y, 10);//�??
-  OLED_ShowCHinese( index[0][1].x, index[0][1].y, 13);//�??
+  OLED_ShowCHinese( index[0][0].x, index[0][0].y, 10);//�??
+  OLED_ShowCHinese( index[0][1].x, index[0][1].y, 13);//�??
   OLED_ShowChar(    index[0][2].x, index[0][2].y, ':', 16);
 
-  OLED_ShowCHinese(index[1][0].x, index[1][0].y, 11);//�??
-  OLED_ShowCHinese(index[1][1].x, index[1][1].y, 12);//�??
-  OLED_ShowCHinese(index[1][2].x, index[1][2].y, 13);//�??
+  OLED_ShowCHinese(index[1][0].x, index[1][0].y, 11);//�??
+  OLED_ShowCHinese(index[1][1].x, index[1][1].y, 12);//�??
+  OLED_ShowCHinese(index[1][2].x, index[1][2].y, 13);//�??
   OLED_ShowChar(    index[1][3].x, index[1][3].y, ':', 16);
 
   OLED_ShowString(index[2][0].x,index[2][0].y,"PH",16);//PH
   OLED_ShowChar(    index[2][1].x, index[2][1].y, ':', 16);
 
-  OLED_ShowCHinese( index[3][0].x, index[3][0].y, 14);//�??
+  OLED_ShowCHinese( index[3][0].x, index[3][0].y, 14);//�??
   OLED_ShowCHinese( index[3][1].x, index[3][1].y, 15);//度寸
 
 
-  OLED_ShowCHinese( index[3][4].x, index[3][4].y, 0);//�??
-  OLED_ShowCHinese( index[3][5].x, index[3][5].y, 16);//�??
+  OLED_ShowCHinese( index[3][4].x, index[3][4].y, 0);//�??
+  OLED_ShowCHinese( index[3][5].x, index[3][5].y, 16);//�??
 
 
 	while (1)
   {
 
     char tempStr[10]; // 用来存放格式化后的字符串
-    // 格式化浮点数，保留一位小�??
+    // 格式化浮点数，保留一位小�??
     sprintf(tempStr, "%.1f", TEMP_Value);
-    // 显示字符�??
-    OLED_ShowString(index[0][3].x, index[0][3].y, tempStr, 16); // 假设显示�?? (0, 0) 位置，使�??16号字�??
+    // 显示字符�??
+    OLED_ShowString(index[0][3].x, index[0][3].y, tempStr, 16); // 假设显示�?? (0, 0) 位置，使�??16号字�??
 
     char TDSStr[10]; // 用来存放格式化后的字符串
-    // 格式化浮点数，保留一位小�??
+    // 格式化浮点数，保留一位小�??
     sprintf(TDSStr, "%.1f", TDS_Value);
-    // 显示字符�??
-    OLED_ShowString(index[1][4].x, index[1][4].y, TDSStr, 16); // 假设显示�?? (0, 0) 位置，使�??16号字�??
+    // 显示字符�??
+    OLED_ShowString(index[1][4].x, index[1][4].y, TDSStr, 16); // 假设显示�?? (0, 0) 位置，使�??16号字�??
 
 
 
     char phStr[10]; // 用来存放格式化后的字符串
-    // 格式化浮点数，保留一位小�??
+    // 格式化浮点数，保留一位小�??
     sprintf(phStr, "%.1f", PH_Value);
-    // 显示字符�??
-    OLED_ShowString(index[2][2].x, index[2][2].y, phStr, 16); // 假设显示�?? (0, 0) 位置，使�??16号字�??
+    // 显示字符�??
+    OLED_ShowString(index[2][2].x, index[2][2].y, phStr, 16); // 假设显示�?? (0, 0) 位置，使�??16号字�??
 
     char SIZEStr[10]; // 用来存放格式化后的字符串
-    // 格式化浮点数，保留一位小�??
+    // 格式化浮点数，保留一位小�??
     sprintf(SIZEStr, "%.1f", SIZE_Value);
-    // 显示字符�??
-    OLED_ShowString(index[3][2].x, index[3][2].y, SIZEStr, 15); // 假设显示�?? (0, 0) 位置，使�??16号字�??
+    // 显示字符�??
+    OLED_ShowString(index[3][2].x, index[3][2].y, SIZEStr, 15); // 假设显示�?? (0, 0) 位置，使�??16号字�??
 
     char SPEEDStr[10]; // 用来存放格式化后的字符串
-    // 格式化浮点数，保留一位小�??
+    // 格式化浮点数，保留一位小�??
     sprintf(SPEEDStr, "%.1f", SPEED_Value);
-    // 显示字符�??
-    OLED_ShowString(index[3][6].x, index[3][6].y, SPEEDStr, 15); // 假设显示�?? (0, 0) 位置，使�??16号字�??
+    // 显示字符�??
+    OLED_ShowString(index[3][6].x, index[3][6].y, SPEEDStr, 15); // 假设显示�?? (0, 0) 位置，使�??16号字�??
 
     rt_kprintf("正在运行:oled\n");
     rt_thread_mdelay(1000);
@@ -315,18 +316,18 @@ void oled_menu(void *prmt){
 }
 //数据控制- wifi通信
 void data_controller(void *prmt){
-  // wifi初始�????
+  // wifi初始�????
 	Esp01s_Init("AspyRain", "[FrommetoU]", "192.168.70.191",8888);
 	while (esp_flag)
   {
     char buffer[100];  // 预留足够的空间存放字符串
 
-    // 格式化字符串，保留一位小�??
+    // 格式化字符串，保留一位小�??
     sprintf(buffer, "data:%.1f,%.1f,%.1f,%.1f,%.1f\n", 
             TEMP_Value, PH_Value, TDS_Value, SIZE_Value, SPEED_Value);
 
     // 打印结果
-    rt_kprintf("发�?�数�??%s\n", buffer);
+    rt_kprintf("发�?�数�??%s\n", buffer);
     espSend(buffer,0);
 		rt_kprintf("正在运行:wifi通信\n");
     rt_thread_mdelay(2000);
@@ -336,7 +337,7 @@ void data_controller(void *prmt){
 
 void TDS_Value_Conversion()
 {
-    // 1️⃣ 读取 ADC 电压（HAL 方式�???
+    // 1️⃣ 读取 ADC 电压（HAL 方式�???
     HAL_ADC_Start(&hadc2);
     HAL_ADC_PollForConversion(&hadc2, 10);
     ADC_ConvertedValue[0] = HAL_ADC_GetValue(&hadc2);
@@ -344,8 +345,8 @@ void TDS_Value_Conversion()
 
     ADC_ConvertedValueLocal[0] = (float)ADC_ConvertedValue[0] / 4096 * 3.3; // AD 转换
 
-    // 2️⃣ 读取温度（如果使用内部温度传感器，可�??? ADC 采集�???
-    float TEMP_Value = 25.0; // 默认 25°C，如有温度传感器可替�???
+    // 2️⃣ 读取温度（如果使用内部温度传感器，可�??? ADC 采集�???
+    float TEMP_Value = 25.0; // 默认 25°C，如有温度传感器可替�???
 
     // 3️⃣ 计算温度补偿系数
     compensationCoefficient = 1.0 + 0.02 * (TEMP_Value - 25.0);
@@ -365,7 +366,7 @@ void TDS_Value_Conversion()
     if (TDS_value <= 0) { TDS_value = 0; }
     if (TDS_value > 1400) { TDS_value = 1400; }
 
-    // 6️⃣ 格式化输�???
+    // 6️⃣ 格式化输�???
     TDS_Buff[0] = (int)(TDS_value) / 1000 + '0';
     TDS_Buff[1] = (int)(TDS_value) % 1000 / 100 + '0';
     TDS_Buff[2] = (int)(TDS_value * 100) % 100 / 10 + '0';

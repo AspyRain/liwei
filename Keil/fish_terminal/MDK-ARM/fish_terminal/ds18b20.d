@@ -1,5 +1,5 @@
-fish_terminal/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
-  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h \
+fish_terminal/ds18b20.o: ..\Core\Src\ds18b20.c ..\Core\Inc\ds18b20.h \
+  ..\Core\Inc\main.h ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h \
   ..\Core\Inc\stm32f1xx_hal_conf.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rcc.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_def.h \
@@ -39,10 +39,4 @@ fish_terminal/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   ..\Middlewares\Third_Party\RealThread_RTOS\include\rtservice.h \
   ..\Middlewares\Third_Party\RealThread_RTOS\finsh\finsh_api.h \
   ..\Middlewares\Third_Party\RealThread_RTOS\finsh\finsh_config.h \
-  ..\Core\Inc\adc.h ..\Core\Inc\i2c.h ..\Core\Inc\tim.h \
-  ..\Core\Inc\usart.h ..\Core\Inc\gpio.h ..\Core\Inc\esp01s.h \
-  ..\Core\Inc\ds18b20.h ..\Core\Inc\global.h \
-  D:\software\Keil5\ARM\ARMCLANG\Bin\..\include\stdio.h \
-  D:\software\Keil5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
-  D:\software\Keil5\ARM\ARMCLANG\Bin\..\include\string.h \
-  ..\Core\Inc\oled.h
+  ..\Core\Inc\tim.h
