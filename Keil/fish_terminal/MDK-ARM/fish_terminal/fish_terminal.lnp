@@ -1,8 +1,8 @@
 --cpu Cortex-M3
 "fish_terminal\startup_stm32f103xb.o"
 "fish_terminal\globals.o"
-"fish_terminal\main.o"
 "fish_terminal\systick.o"
+"fish_terminal\main.o"
 "fish_terminal\gpio.o"
 "fish_terminal\adc.o"
 "fish_terminal\i2c.o"

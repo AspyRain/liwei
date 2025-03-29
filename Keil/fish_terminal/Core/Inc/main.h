@@ -87,6 +87,8 @@ void reciveData();
 #define FISH_TX_GPIO_Port GPIOB
 #define FISH_RX_Pin GPIO_PIN_11
 #define FISH_RX_GPIO_Port GPIOB
+#define DS18B20_Pin GPIO_PIN_12
+#define DS18B20_GPIO_Port GPIOA
 #define OLED_SCL_Pin GPIO_PIN_6
 #define OLED_SCL_GPIO_Port GPIOB
 #define OLED_SDA_Pin GPIO_PIN_7
