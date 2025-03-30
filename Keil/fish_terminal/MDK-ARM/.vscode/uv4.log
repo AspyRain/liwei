@@ -1,2 +1,4 @@
 Load "fish_terminal\\fish_terminal.axf" 
-Erase Done.Programming Done.Verify OK.Flash Load finished at 21:30:03
+No ST-LINK detected
+Error: Flash Download failed  -  Target DLL has been cancelled
+Flash Load finished at 10:16:12

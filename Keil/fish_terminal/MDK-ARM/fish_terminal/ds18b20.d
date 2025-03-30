@@ -1,5 +1,5 @@
 fish_terminal/ds18b20.o: ..\Core\Src\ds18b20.c ..\Core\Inc\ds18b20.h \
-  ..\Core\Inc\main.h ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h \
+  ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h \
   ..\Core\Inc\stm32f1xx_hal_conf.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rcc.h \
   ..\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_def.h \
@@ -38,5 +38,4 @@ fish_terminal/ds18b20.o: ..\Core\Src\ds18b20.c ..\Core\Inc\ds18b20.h \
   D:\software\Keil5\ARM\ARMCLANG\Bin\..\include\stdarg.h \
   ..\Middlewares\Third_Party\RealThread_RTOS\include\rtservice.h \
   ..\Middlewares\Third_Party\RealThread_RTOS\finsh\finsh_api.h \
-  ..\Middlewares\Third_Party\RealThread_RTOS\finsh\finsh_config.h \
-  ..\Core\Inc\tim.h
+  ..\Middlewares\Third_Party\RealThread_RTOS\finsh\finsh_config.h

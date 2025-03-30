@@ -1,195 +1,152 @@
 #include "ds18b20.h"
-#include "tim.h"
-#include <rtthread.h>  // 引入 RT-Thread 打印库
-
-#define DS18B20_Set(x) 		HAL_GPIO_WritePin(DS18B20_GPIO_Port, DS18B20_Pin, (GPIO_PinState)(x))
-#define DS18B20_Get()	 		HAL_GPIO_ReadPin(DS18B20_GPIO_Port, DS18B20_Pin)
-
-void DS18B20_WriteByte(uint8_t byte);
-uint8_t DS18B20_ReadByte(void);
-
-
-/*****************************************************************************
-* 说明：DS18B20的微秒延时函数
-* 输入：_usTime时间
-* 输出：无
-*****************************************************************************/
-static void DS18B20_DelayUs(uint16_t _usTime)
+#include "rtthread.h"
+void delay_us_self(uint32_t time)
 {
-	__HAL_TIM_SetCounter(&htim3,0);
-	__HAL_TIM_ENABLE(&htim3);
-	while(__HAL_TIM_GetCounter(&htim3) < _usTime);
-	__HAL_TIM_DISABLE(&htim3);
+  time *= 10;
+	while(time)
+		time--;
+}
+// 单总线写低
+void ds18b20_write_low(void)
+{
+    HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_RESET);
+    delay_us_self(480); // 持续低电平 480us
+    rt_kprintf("Writing LOW to the bus\n");
 }
 
-/*****************************************************************************
-* 说明：复位并检测DS18B20的存在
-* 主机和DS18B20做任何通讯前都需要对其初始化。
-* 初始化期间，总线控制器拉低总线并保持480us以上挂在总线上的器件将被复位，
-* 然后释放总线，等到15-60us，此时18B20将返回一个60-240us之间的低电平存在信号。
-* 输入：无
-* 输出：1=存在，0=不存在
-*****************************************************************************/
-uint8_t DS18B20_Reset(void)
+// 单总线写高
+void ds18b20_write_high(void)
 {
-    uint8_t presence = 0;
-    // 拉低总线
-    DS18B20_Set(0);
-    rt_kprintf("Sending reset signal to DS18B20...\n");
-    DS18B20_DelayUs(600);
-    
-    // 释放总线
-    DS18B20_Set(1);
-    rt_kprintf("Releasing bus...\n");
-    DS18B20_DelayUs(60);
-    
-    // 检测DS18B20响应
-    presence = DS18B20_Get();
-    DS18B20_DelayUs(240);
-    
-    if (presence == GPIO_PIN_SET) {
-        rt_kprintf("Presence pulse detected.\n");
-    } else {
-        rt_kprintf("No presence pulse detected.\n");
-    }
-
-    return !presence;
+    HAL_GPIO_WritePin(DS18B20_PORT, DS18B20_PIN, GPIO_PIN_SET);
+    delay_us_self(60);  // 写高电平 60us
+    rt_kprintf("Writing HIGH to the bus\n");
 }
 
-/*****************************************************************************
-* 说明：复位DS18B20
-* 输入：无
-* 输出：无
-*****************************************************************************/
-void DS18B20_Init(void)
+// 读取单总线的值
+uint8_t ds18b20_read_bit(void)
 {
-    rt_kprintf("Initializing DS18B20...\n");
-    // 复位DS18B20
-    DS18B20_Reset();
+    uint8_t bit_val;
     
-    // 发送跳过ROM命令
-    DS18B20_WriteByte(DS18B20_CMD_SKIP_ROM);
-    rt_kprintf("Sent SKIP ROM command.\n");
+    // 写低电平，并延时
+    ds18b20_write_low();
+    delay_us_self(1);
+    
+    // 释放总线并延时，等待 DS18B20 响应
+    ds18b20_write_high();
+    delay_us_self(14);
+    
+    // 读取引脚值（读取是否有响应）
+    bit_val = HAL_GPIO_ReadPin(DS18B20_PORT, DS18B20_PIN);
+    delay_us_self(45); // 等待数据稳定
+    
+    rt_kprintf("Read bit: %d\n", bit_val); // 输出读取的位值
+    return bit_val;
 }
 
-
-
-/*****************************************************************************
-* 说明：发送一个字节给DS18B20
-* 1.总线控制器要产生一个写时序，必须将总线拉低最少1us，
-* 2.产生写0时序时总线必须保持低电平60~120us之间，然后释放总线，
-* 3.产生写1时序时在总线产生写时序后的15us内允许把总线拉高。
-* 4.注意：2次写周期之间至少间隔1us
-* 输入：无
-* 输出：无
-*****************************************************************************/
-void DS18B20_WriteByte(uint8_t byte)
+// 发送一个字节（8位）到单总线
+void ds18b20_write_byte(uint8_t byte)
 {
-    rt_kprintf("Writing byte: 0x%02X...\n", byte);
-    for (uint8_t i = 0; i < 8; i++)
+    rt_kprintf("Writing byte: 0x%02X\n", byte); // 输出要写入的字节
+    for (int i = 0; i < 8; i++)
     {
-        // 发送低位
-        DS18B20_Set(0);
-        DS18B20_DelayUs(2);
-        
-        // 发送高位，根据byte的第i位来决定
-        if (byte & (1 << i))
+        if (byte & 0x01)
         {
-            DS18B20_Set(1);
+            ds18b20_write_high(); // 写 1
         }
-        
-        DS18B20_DelayUs(60);
-        
-        // 释放总线
-        DS18B20_Set(1);
+        else
+        {
+            ds18b20_write_low(); // 写 0
+        }
+        byte >>= 1;
     }
-    rt_kprintf("Byte written: 0x%02X\n", byte);
 }
 
-/*****************************************************************************
-* 说明：从DS18B20读取一个字节
-* 1.总线控制器要产生一个读时序，必须将总线拉低至少1us，
-* 2.然后释放总线，在读信号开始后15us内总线控制器采样总线数据，读一位数据至少保持在60us以上。
-* 3.注意：2次读周期之间至少间隔1us
-* 输入：无
-* 输出：无
-*****************************************************************************/
-uint8_t DS18B20_ReadByte(void)
+// 从 DS18B20 读取一个字节
+uint8_t ds18b20_read_byte(void)
 {
     uint8_t byte = 0;
-    
     rt_kprintf("Reading byte...\n");
-
-    for (uint8_t i = 0; i < 8; i++)
+    for (int i = 0; i < 8; i++)
     {
-        // 发送低位
-        DS18B20_Set(0);
-        DS18B20_DelayUs(2);
-        
-        // 释放总线
-        DS18B20_Set(1);
-        DS18B20_DelayUs(8);
-        
-        // 读取高位数据
-        if (DS18B20_Get())
+        byte >>= 1;
+        if (ds18b20_read_bit())
         {
-            byte |= (1 << i);
+            byte |= 0x80; // 如果读取到 1，则设置高位为 1
         }
-        
-        DS18B20_DelayUs(50);
     }
-
-    rt_kprintf("Byte read: 0x%02X\n", byte);
+    rt_kprintf("Read byte: 0x%02X\n", byte); // 输出读取的字节
     return byte;
 }
 
-/*****************************************************************************
-* 说明：启动DS18B20转换
-* 输入：无
-* 输出：无
-*****************************************************************************/
-void DS18B20_StartConv(void)
+// 初始化 DS18B20 传感器
+void ds18b20_init(void)
 {
-    rt_kprintf("Starting DS18B20 conversion...\n");
-	DS18B20_Init();
-    // 发送温度转换命令
-    DS18B20_WriteByte(DS18B20_CMD_CONVERT_T);
-    rt_thread_mdelay(800);  // 延时 800ms，适用于12位精度	
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    
+    // 配置引脚为推挽输出模式
+    GPIO_InitStruct.Pin = DS18B20_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(DS18B20_PORT, &GPIO_InitStruct);
+    
+    // 延时，确保传感器稳定
+    rt_thread_mdelay(1000);
+    rt_kprintf("DS18B20 sensor initialized.\n");
 }
 
-/*****************************************************************************
-* 说明：读取DS18B20温度
-* 1.温度精度及转换时间表
---------------------------------------
-R1	R0	精度	最大转换时间	温度LSB
---------------------------------------
-0	0	9bit	93.75ms			0.5℃
-0	1	10bit	187.5ms			0.25℃
-1	0	11bit	375ms			0.125℃
-1	1	12bit	750ms			0.0625℃
---------------------------------------
-* 输入：无
-* 输出：浮点型温度数据
-*****************************************************************************/
-float DS18B20_GetTemp(void)
+// 读取温度数据
+float ds18b20_read_temperature(void)
 {
-    rt_kprintf("Getting temperature...\n");
+    uint8_t temp_lsb, temp_msb;
+    int16_t temp_raw;
+    float temperature;
     
-    // 复位DS18B20并跳过ROM
-    DS18B20_Init();
+    rt_kprintf("Starting temperature read sequence...\n");
+
+    // 发送 RESET 命令
+    ds18b20_write_low();
+    delay_us_self(480); // 480us
+    ds18b20_write_high();
+    delay_us_self(80);  // 80us
+    rt_kprintf("Sent RESET pulse.\n");
+
+    // 检查是否有设备响应
+    if (!ds18b20_read_bit())
+    {
+        // 设备无响应
+        rt_kprintf("No response from DS18B20.\n");
+        return -9999.0;
+    }
     
-    // 发送读取寄存器命令
-    DS18B20_WriteByte(DS18B20_CMD_READ_SCRATCHPAD);
+    rt_kprintf("Device response received.\n");
+
+    // 发送 CONVERT T 命令（开始转换温度）
+    ds18b20_write_byte(0x44);
+    delay_us_self(750);  // 转换时间
+    rt_kprintf("Sent CONVERT T command, waiting for conversion...\n");
+
+    // 发送 RESET 命令
+    ds18b20_write_low();
+    delay_us_self(480); // 480us
+    ds18b20_write_high();
+    delay_us_self(80);  // 80us
     
-    // 读取温度数据
-    uint8_t tempLow = DS18B20_ReadByte();
-    uint8_t tempHigh = DS18B20_ReadByte();
+    // 发送 READ SCRATCHPAD 命令（读取温度数据）
+    ds18b20_write_byte(0xBE);
+    rt_kprintf("Sent READ SCRATCHPAD command.\n");
     
-    // 计算温度值
-    int16_t temp = (tempHigh << 8) | tempLow;
-    float temperature = (float)temp / 16.0f; /* 0.0625℃ */
+    // 读取温度的低字节和高字节
+    temp_lsb = ds18b20_read_byte();
+    temp_msb = ds18b20_read_byte();
     
-    rt_kprintf("Temperature read: %.2f°C\n", temperature);
+    rt_kprintf("Received temperature LSB: 0x%02X, MSB: 0x%02X\n", temp_lsb, temp_msb);
+    
+    // 合并温度值
+    temp_raw = (temp_msb << 8) | temp_lsb;
+    
+    // 转换成温度值（单位：摄氏度）
+    temperature = (float)temp_raw / 16.0;
+    rt_kprintf("Raw temperature: %d, Converted temperature: %.2f°C\n", temp_raw, temperature);
     
     return temperature;
 }

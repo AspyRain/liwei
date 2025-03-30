@@ -1,16 +1,14 @@
-#ifndef __DS18B20_H
-#define __DS18B20_H
+#ifndef DS18B20_H
+#define DS18B20_H
 
-#include "main.h"
+#include "stm32f1xx_hal.h"
 
-// ??DS18B20????
-#define DS18B20_CMD_SKIP_ROM        0xCC
-#define DS18B20_CMD_CONVERT_T       0x44
-#define DS18B20_CMD_READ_SCRATCHPAD 0xBE
+// 定义用于连接的单总线引脚
+#define DS18B20_PIN GPIO_PIN_12
+#define DS18B20_PORT GPIOA
 
-void DS18B20_Init(void);
-uint8_t DS18B20_Reset(void);
-void DS18B20_StartConv(void);
-float DS18B20_GetTemp(void);
-
-#endif
+// 函数声明
+void ds18b20_init(void);
+float ds18b20_read_temperature(void);
+void delay_us(uint32_t time);
+#endif // DS18B20_H

@@ -68,6 +68,7 @@ void data_controller(void *prmt);
 void clearUsart();
 void TDS_Value_Conversion();
 void reciveData();
+float Get_pH_Value(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
