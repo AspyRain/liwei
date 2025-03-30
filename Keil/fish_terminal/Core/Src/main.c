@@ -127,9 +127,9 @@ int main(void)
   HAL_UART_Receive_IT(&huart2, (uint8_t *)&usart2_c, 1);
   HAL_TIM_Base_Start(&htim3);
 
-  // rt_thread_t ph_task = rt_thread_begin("ph_task",
-  //                                            get_ph, RT_NULL,
-  //                                            1024, 3, 10);
+  rt_thread_t ph_task = rt_thread_begin("ph_task",
+                                             get_ph, RT_NULL,
+                                             1024, 3, 10);
 
   rt_thread_t turbidity_task = rt_thread_begin("turbidity_task",
                                                get_turbidity, RT_NULL,
@@ -139,9 +139,9 @@ int main(void)
                                           oled_menu, RT_NULL,
                                           1024, 3, 10);
 
-  // rt_thread_t data_controller_task = rt_thread_begin("data_controller_task",
-  //                                           data_controller, RT_NULL,
-  //                                           1024, 3, 10);
+  rt_thread_t data_controller_task = rt_thread_begin("data_controller_task",
+                                            data_controller, RT_NULL,
+                                            1024, 3, 10);
 
   while (esp_flag == 0)
   {
@@ -155,7 +155,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
     
-    rt_thread_mdelay(10);
+    rt_thread_mdelay(50);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -234,7 +234,7 @@ void get_ph(void *prmt)
 {
   while (esp_flag == 0)
   {
-    rt_thread_mdelay(10);
+    rt_thread_mdelay(50);
   }
   while (1)
   {
@@ -250,7 +250,7 @@ void get_turbidity(void *prmt)
   ds18b20_init();
   while (esp_flag == 0)
   {
-    rt_thread_mdelay(10);
+    rt_thread_mdelay(50);
   }
   while (1)
   {
@@ -291,7 +291,7 @@ void oled_menu(void *prmt)
 
   while (esp_flag == 0)
   {
-    rt_thread_mdelay(10);
+    rt_thread_mdelay(50);
   }
   
   OLED_Clear();

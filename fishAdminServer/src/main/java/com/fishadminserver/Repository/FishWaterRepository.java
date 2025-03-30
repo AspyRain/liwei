@@ -15,8 +15,8 @@ public interface FishWaterRepository extends JpaRepository<FishWater, Integer> {
     List<FishWater> findRecentRecords(@Param("startTime") LocalDateTime startTime);
 
     // 统计前 n 天的平均值
-    @Query(value = "SELECT DATE(fw.date) AS day, AVG(f.speed), AVG(f.size), ROUND(AVG(f.status)), " +
-            "AVG(wq.ph_value), AVG(wq.turbidity), AVG(wq.temperature), ROUND(AVG(wq.status)) " +
+    @Query(value = "SELECT DATE(fw.date) AS day, AVG(f.speed), AVG(f.size), " +
+            "AVG(wq.ph_value), AVG(wq.turbidity), AVG(wq.temperature) " +
             "FROM fish_water fw " +
             "JOIN fishrecords f ON fw.fish_id = f.id " +
             "JOIN wqrecords wq ON fw.wq_id = wq.id " +

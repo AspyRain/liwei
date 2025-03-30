@@ -81,11 +81,9 @@ public class FishWaterService {
                 ((java.sql.Date) obj[0]).toLocalDate().atStartOfDay(), // 日期（转换为 LocalDateTime）
                 ((Number) obj[1]).doubleValue(), // 平均速度
                 ((Number) obj[2]).doubleValue(), // 平均体型
-                ((Number) obj[3]).intValue(),   // 鱼状态
-                ((Number) obj[4]).doubleValue(), // 平均 pH 值
-                ((Number) obj[5]).doubleValue(), // 平均浑浊度
-                ((Number) obj[6]).doubleValue(), // 平均温度
-                ((Number) obj[7]).intValue()    // 水质状态
+                ((Number) obj[3]).doubleValue(), // 平均 pH 值
+                ((Number) obj[4]).doubleValue(), // 平均浑浊度
+                ((Number) obj[5]).doubleValue() // 平均温度
         )).toList();
         List<FishWater> fishWaters = new ArrayList<>();
         for (DailyAverageDTO dailyAverageDTO : dailyAverageDTOS) {
