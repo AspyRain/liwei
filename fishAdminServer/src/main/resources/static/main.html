@@ -258,7 +258,7 @@
                 this.fetchLastOneData(); // 获取最近一条数据
                 this.fetchDataChecks();
                 setInterval(this.fetchImage, 60000);// 每 1 小时更新一次
-                this.intervalId = setInterval(this.fetchLastOneData, 600000); // 每 1 分钟更新一次
+                this.intervalId = setInterval(this.fetchLastOneData, 10000); // 每 1 分钟更新一次
             },
             beforeDestroy() {
                 clearInterval(this.intervalId);

@@ -25,9 +25,9 @@ void Esp01s_Init(char *ip, char *password, char *server,int port)
   sendData(&huart2, command);
   rt_thread_mdelay(2000);
   sendData(&huart2, "AT+CIPMODE=1\r\n");
-  rt_thread_mdelay(2000);
+  rt_thread_mdelay(1000);
   sendData(&huart2, "AT+CIPSEND\r\n");
-  rt_thread_mdelay(2000);
+  rt_thread_mdelay(1000);
   esp_flag = 1;
   // 清空接收缓冲区
   huart2.Instance->DR; // 读取数据寄存器，将接收缓冲区中的数据清空
