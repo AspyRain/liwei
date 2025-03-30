@@ -240,7 +240,7 @@ void get_ph(void *prmt)
   {
     PH_Value=Get_pH_Value();
     rt_kprintf("正在运行:getph\n");
-    rt_thread_mdelay(5000);
+    rt_thread_mdelay(2000);
   }
 }
 
@@ -263,7 +263,7 @@ void get_turbidity(void *prmt)
 
     TDS_Value_Conversion();
     rt_kprintf("tds: %d\n", (int)TDS_Value);
-    rt_thread_mdelay(5000);
+    rt_thread_mdelay(2000);
   }
 }
 // 获取 pH 值的函数
@@ -346,7 +346,7 @@ void oled_menu(void *prmt)
     // 显示字符�???
     OLED_ShowString(index[3][6].x, index[3][6].y, SPEEDStr, 15); // 假设显示�??? (0, 0) 位置，使�???16号字�???
 
-    rt_thread_mdelay(5000);
+    rt_thread_mdelay(2000);
   }
 }
 // 数据控制- wifi通信
@@ -366,7 +366,7 @@ void data_controller(void *prmt)
     rt_kprintf("发�?�数�???%s\n", buffer);
     espSend(buffer, 0);
     rt_kprintf("正在运行:wifi通信\n");
-    rt_thread_mdelay(5000);
+    rt_thread_mdelay(2000);
   }
 }
 
