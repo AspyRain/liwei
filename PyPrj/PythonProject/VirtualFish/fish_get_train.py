@@ -1,5 +1,7 @@
 import pygame
 import random
+import time
+import os
 
 # 初始化pygame
 pygame.init()
@@ -19,9 +21,9 @@ ALL_BLOCK_STYLES = [
     ["assets/fish3_1.png", "assets/fish3_2.png", "assets/fish3_3.png"]
 ]
 SIMPLE_BLOCK_STYLES =  ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"]
-BLOCK_SIZE = 50  # 初始大小
-GROWTH_RATES = [0.01, 0.02, 0.03]  # 可选的成长速度
-MAX_SIZE = 150  # 最大尺寸
+BLOCK_SIZE = 45  # 初始大小
+GROWTH_RATES = [0.0005, 0.0008, 0.001]  # 可选的成长速度
+MAX_SIZE = 200  # 最大尺寸
 
 SPEED_VARIATION = 0.2  # 速度变化的平滑度
 
@@ -80,10 +82,20 @@ class Block:
 
 # 生成多个方块，每个方块存储多个预备样式，并有不同的成长速度
 blocks = [Block(random.choice(ALL_BLOCK_STYLES), random.choice(GROWTH_RATES)) for _ in range(9)]
-blocks.append(Block(SIMPLE_BLOCK_STYLES, 0.02))
+blocks.append(Block(SIMPLE_BLOCK_STYLES, 0.0025))
 
 clock = pygame.time.Clock()
 running = True
+
+# 上次截图时间
+last_screenshot_time = pygame.time.get_ticks()
+
+# 创建image文件夹（如果不存在的话）
+if not os.path.exists("image"):
+    os.makedirs("image")
+
+# 截图计数器
+screenshot_count = 0
 
 # 游戏主循环
 while running:
@@ -104,6 +116,19 @@ while running:
         block.switch_style()
         block.move()
         block.draw(screen)
+
+    # 检查是否到了截屏时间（每10秒）
+    current_time = pygame.time.get_ticks()
+    if current_time - last_screenshot_time >= 10000:  # 10秒
+        last_screenshot_time = current_time  # 更新上次截图时间
+        if screenshot_count < 100:  # 如果截图数量小于100
+            screenshot_filename = f"image/screenshot_{screenshot_count + 1}.png"  # 截图文件名
+            pygame.image.save(screen, screenshot_filename)  # 保存截图
+            print(f"Saved screenshot: {screenshot_filename}")
+            screenshot_count += 1  # 增加截图计数器
+        if screenshot_count >= 100:  # 截图达到100时退出
+            running = False
+            print("Saved 100 screenshots, exiting...")
 
     pygame.display.flip()
     clock.tick(60)  # 控制帧率
