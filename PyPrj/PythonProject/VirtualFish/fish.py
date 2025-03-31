@@ -94,6 +94,9 @@ last_screenshot_time = pygame.time.get_ticks()
 if not os.path.exists("image"):
     os.makedirs("image")
 
+# 截图计数器
+screenshot_count = 0
+
 # 游戏主循环
 while running:
     screen.blit(background, (0, 0))  # 绘制背景
@@ -118,9 +121,14 @@ while running:
     current_time = pygame.time.get_ticks()
     if current_time - last_screenshot_time >= 10000:  # 10秒
         last_screenshot_time = current_time  # 更新上次截图时间
-        screenshot_filename = f"image/screenshot_{int(current_time / 1000)}.png"  # 截图文件名
-        pygame.image.save(screen, screenshot_filename)  # 保存截图
-        print(f"Saved screenshot: {screenshot_filename}")
+        if screenshot_count < 100:  # 如果截图数量小于100
+            screenshot_filename = f"image/screenshot_{screenshot_count + 1}.png"  # 截图文件名
+            pygame.image.save(screen, screenshot_filename)  # 保存截图
+            print(f"Saved screenshot: {screenshot_filename}")
+            screenshot_count += 1  # 增加截图计数器
+        if screenshot_count >= 100:  # 截图达到100时退出
+            running = False
+            print("Saved 100 screenshots, exiting...")
 
     pygame.display.flip()
     clock.tick(60)  # 控制帧率
