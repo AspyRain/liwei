@@ -12,9 +12,9 @@ screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 WIDTH, HEIGHT = screen.get_size()
 pygame.display.set_caption("Random Moving Blocks")
 
-# 创建 img 文件夹，如果不存在的话
-if not os.path.exists("img"):
-    os.makedirs("img")
+# 创建保存截图的文件夹
+if not os.path.exists('img'):
+    os.makedirs('img')
 
 # 加载背景图片（可替换）
 background = pygame.image.load("assets/background.jpg")
@@ -25,12 +25,13 @@ ALL_BLOCK_STYLES = [
     ["assets/fish1_1.png", "assets/fish1_2.png", "assets/fish1_3.png"],
     ["assets/fish3_1.png", "assets/fish3_2.png", "assets/fish3_3.png"]
 ]
-SIMPLE_BLOCK_STYLES =  ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"]
+SIMPLE_BLOCK_STYLES = ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"]
 BLOCK_SIZE = 50  # 初始大小
 GROWTH_RATES = [0.01, 0.02, 0.03]  # 可选的成长速度
-MAX_SIZE = 300  # 最大尺寸
+MAX_SIZE = 200  # 最大尺寸
 
-SPEED_VARIATION = 0.3  # 速度变化的平滑度
+SPEED_VARIATION = 0.01  # 速度变化的平滑度
+
 
 # 方块类
 class Block:
@@ -85,20 +86,46 @@ class Block:
         resized_image = pygame.transform.scale(self.current_style, (int(self.size), int(self.size)))
         screen.blit(resized_image, (self.x, self.y))
 
+
 # 生成多个方块，每个方块存储多个预备样式，并有不同的成长速度
 blocks = [Block(random.choice(ALL_BLOCK_STYLES), random.choice(GROWTH_RATES)) for _ in range(9)]
 blocks.append(Block(SIMPLE_BLOCK_STYLES, 0.02))
 
+
+# 截图功能
+def save_screenshot():
+    # 保存截图前，先改变窗口大小为640x640
+    screen = pygame.display.set_mode((640, 640))  # 改为640x640
+    time.sleep(0.1)  # 稍微等待以确保窗口大小变更
+    screenshot = pygame.Surface((640, 640))
+    screenshot.blit(pygame.display.get_surface(), (0, 0))
+
+    # 获取当前时间
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+    filepath = f"img/screenshot_{timestamp}.png"
+
+    # 保存截图
+    pygame.image.save(screenshot, filepath)
+
+    # 恢复原始窗口尺寸
+    pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
+
+
+# 设置定时器，每10秒截屏一次
+last_screenshot_time = time.time()
+
 clock = pygame.time.Clock()
 running = True
-
-# 用来控制截图的时间间隔
-last_screenshot_time = pygame.time.get_ticks()
-screenshot_interval = 10000  # 截图间隔时间（毫秒），10秒
 
 # 游戏主循环
 while running:
     screen.blit(background, (0, 0))  # 绘制背景
+
+    # 检查是否需要截屏
+    current_time = time.time()
+    if current_time - last_screenshot_time >= 10:  # 每10秒截一次图
+        save_screenshot()
+        last_screenshot_time = current_time  # 更新截屏时间
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -109,15 +136,6 @@ while running:
             elif event.key == pygame.K_SPACE:
                 for block in blocks:
                     block.switch_style()  # 按 SPACE 键切换样式
-
-    # 检查是否到了截图的时间
-    current_time = pygame.time.get_ticks()
-    if current_time - last_screenshot_time >= screenshot_interval:
-        last_screenshot_time = current_time  # 更新上次截图时间
-
-        # 生成文件名，保存截图
-        screenshot_filename = os.path.join("img", f"screenshot_{current_time}.png")
-        pygame.image.save(screen, screenshot_filename)  # 保存截图
 
     for block in blocks:
         block.grow()
