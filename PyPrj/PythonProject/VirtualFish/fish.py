@@ -28,9 +28,9 @@ ALL_BLOCK_STYLES = [
 SIMPLE_BLOCK_STYLES =  ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"]
 BLOCK_SIZE = 50  # 初始大小
 GROWTH_RATES = [0.01, 0.02, 0.03]  # 可选的成长速度
-MAX_SIZE = 150  # 最大尺寸
+MAX_SIZE = 300  # 最大尺寸
 
-SPEED_VARIATION = 0.2  # 速度变化的平滑度
+SPEED_VARIATION = 0.3  # 速度变化的平滑度
 
 # 方块类
 class Block:
