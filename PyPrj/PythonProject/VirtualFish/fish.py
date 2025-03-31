@@ -21,9 +21,9 @@ ALL_BLOCK_STYLES = [
     ["assets/fish3_1.png", "assets/fish3_2.png", "assets/fish3_3.png"]
 ]
 SIMPLE_BLOCK_STYLES =  ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"]
-BLOCK_SIZE = 50  # 初始大小
-GROWTH_RATES = [0.01, 0.02, 0.03]  # 可选的成长速度
-MAX_SIZE = 150  # 最大尺寸
+BLOCK_SIZE = 45  # 初始大小
+GROWTH_RATES = [0.0005, 0.0008, 0.001]  # 可选的成长速度
+MAX_SIZE = 200  # 最大尺寸
 
 SPEED_VARIATION = 0.2  # 速度变化的平滑度
 
@@ -82,7 +82,7 @@ class Block:
 
 # 生成多个方块，每个方块存储多个预备样式，并有不同的成长速度
 blocks = [Block(random.choice(ALL_BLOCK_STYLES), random.choice(GROWTH_RATES)) for _ in range(9)]
-blocks.append(Block(SIMPLE_BLOCK_STYLES, 0.02))
+blocks.append(Block(SIMPLE_BLOCK_STYLES, 0.0025))
 
 clock = pygame.time.Clock()
 running = True
