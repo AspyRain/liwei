@@ -1,5 +1,7 @@
 import pygame
 import random
+import os
+import time
 
 # 初始化pygame
 pygame.init()
@@ -9,6 +11,10 @@ WIDTH, HEIGHT = 800, 600  # 初始窗口尺寸
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 WIDTH, HEIGHT = screen.get_size()
 pygame.display.set_caption("Random Moving Blocks")
+
+# 创建 img 文件夹，如果不存在的话
+if not os.path.exists("img"):
+    os.makedirs("img")
 
 # 加载背景图片（可替换）
 background = pygame.image.load("assets/background.jpg")
@@ -21,10 +27,10 @@ ALL_BLOCK_STYLES = [
 ]
 SIMPLE_BLOCK_STYLES =  ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"]
 BLOCK_SIZE = 50  # 初始大小
-GROWTH_RATES = [0.001, 0.002, 0.003]  # 可选的成长速度
-MAX_SIZE = 200  # 最大尺寸
+GROWTH_RATES = [0.01, 0.02, 0.03]  # 可选的成长速度
+MAX_SIZE = 150  # 最大尺寸
 
-SPEED_VARIATION = 0.01  # 速度变化的平滑度
+SPEED_VARIATION = 0.2  # 速度变化的平滑度
 
 # 方块类
 class Block:
@@ -86,6 +92,10 @@ blocks.append(Block(SIMPLE_BLOCK_STYLES, 0.02))
 clock = pygame.time.Clock()
 running = True
 
+# 用来控制截图的时间间隔
+last_screenshot_time = pygame.time.get_ticks()
+screenshot_interval = 10000  # 截图间隔时间（毫秒），10秒
+
 # 游戏主循环
 while running:
     screen.blit(background, (0, 0))  # 绘制背景
@@ -99,6 +109,15 @@ while running:
             elif event.key == pygame.K_SPACE:
                 for block in blocks:
                     block.switch_style()  # 按 SPACE 键切换样式
+
+    # 检查是否到了截图的时间
+    current_time = pygame.time.get_ticks()
+    if current_time - last_screenshot_time >= screenshot_interval:
+        last_screenshot_time = current_time  # 更新上次截图时间
+
+        # 生成文件名，保存截图
+        screenshot_filename = os.path.join("img", f"screenshot_{current_time}.png")
+        pygame.image.save(screen, screenshot_filename)  # 保存截图
 
     for block in blocks:
         block.grow()
