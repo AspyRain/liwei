@@ -5,11 +5,11 @@
 <h2>Tool Versions:</h2>
 IDE-Version: ��Vision V5.37.0.0
 Copyright (C) 2022 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: 123123 1436582605@qq.com, 23, LIC=X96CK-Z7IUK-KPZZY-IRSDW-66JJA-MEQDX
+License Information: 456 456, 456, LIC=YA39H-WMEMY-124LE-57P7K-RM730-XL9NN
  
 Tool Versions:
 Toolchain:       MDK-ARM Plus  Version: 5.37.0.0
-Toolchain Path:  D:\software\Keil_v5\ARM\ARMCLANG\Bin
+Toolchain Path:  D:\software\Keil5\ARM\ARMCLANG\Bin
 C Compiler:      ArmClang.exe V6.18
 Assembler:       Armasm.exe V6.18
 Linker/Locator:  ArmLink.exe V6.18
@@ -17,56 +17,56 @@ Library Manager: ArmAr.exe V6.18
 Hex Converter:   FromElf.exe V6.18
 CPU DLL:         SARMCM3.DLL V5.37.0.0
 Dialog DLL:      DCM.DLL V1.17.5.0
-Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.9.0
+Target DLL:      CMSIS_AGDI.dll V1.33.12.0
 Dialog DLL:      TCM.DLL V1.56.1.0
  
 <h2>Project:</h2>
-d:\study\liwei\Keil\fish_terminal\MDK-ARM\fish_terminal.uvprojx
-Project File Date:  03/30/2025
+e:\Github\liwei\Keil\fish_terminal\MDK-ARM\fish_terminal.uvprojx
+Project File Date:  04/01/2025
 
 <h2>Output:</h2>
-*** Using Compiler 'V6.18', folder: 'D:\software\Keil_v5\ARM\ARMCLANG\Bin'
+*** Using Compiler 'V6.18', folder: 'D:\software\Keil5\ARM\ARMCLANG\Bin'
 Build target 'fish_terminal'
-../Core/Src/main.c(307): warning: passing 'char[3]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+../Core/Src/main.c(292): warning: passing 'char[3]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
   OLED_ShowString(index[2][0].x, index[2][0].y, "PH", 16); // PH
                                                 ^~~~
 ../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
 void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
                                                   ^
-../Core/Src/main.c(323): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
-    OLED_ShowString(index[0][3].x, index[0][3].y, tempStr, 16); // 假设显示�??? (0, 0) 位置，使�???16号字�???
-                                                  ^~~~~~~
+../Core/Src/main.c(306): warning: passing 'char[5]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+          OLED_ShowString(index[0][3].x, index[0][3].y, tempStr, 16); // 假设显示 (0, 0) 位置，使 16 号字
+                                                        ^~~~~~~
 ../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
 void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
                                                   ^
-../Core/Src/main.c(329): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
-    OLED_ShowString(index[1][4].x, index[1][4].y, TDSStr, 16); // 假设显示�??? (0, 0) 位置，使�???16号字�???
-                                                  ^~~~~~
+../Core/Src/main.c(312): warning: passing 'char[6]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+          OLED_ShowString(index[1][4].x, index[1][4].y, TDSStr, 16); // 假设显示 (0, 0) 位置，使 16 号字
+                                                        ^~~~~~
 ../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
 void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
                                                   ^
-../Core/Src/main.c(335): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
-    OLED_ShowString(index[2][2].x, index[2][2].y, phStr, 16); // 假设显示�??? (0, 0) 位置，使�???16号字�???
-                                                  ^~~~~
+../Core/Src/main.c(318): warning: passing 'char[5]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+          OLED_ShowString(index[2][2].x, index[2][2].y, phStr, 16); // 假设显示 (0, 0) 位置，使 16 号字
+                                                        ^~~~~
 ../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
 void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
                                                   ^
-../Core/Src/main.c(341): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
-    OLED_ShowString(index[3][2].x, index[3][2].y, SIZEStr, 15); // 假设显示�??? (0, 0) 位置，使�???16号字�???
-                                                  ^~~~~~~
+../Core/Src/main.c(324): warning: passing 'char[5]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+          OLED_ShowString(index[3][2].x, index[3][2].y, SIZEStr, 15); // 假设显示 (0, 0) 位置，使 15 号字
+                                                        ^~~~~~~
 ../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
 void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
                                                   ^
-../Core/Src/main.c(347): warning: passing 'char[10]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
-    OLED_ShowString(index[3][6].x, index[3][6].y, SPEEDStr, 15); // 假设显示�??? (0, 0) 位置，使�???16号字�???
-                                                  ^~~~~~~~
+../Core/Src/main.c(330): warning: passing 'char[5]' to parameter of type 'uint8_t *' (aka 'unsigned char *') converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+          OLED_ShowString(index[3][6].x, index[3][6].y, SPEEDStr, 15); // 假设显示 (0, 0) 位置，使 15 号字
+                                                        ^~~~~~~~
 ../Core/Inc\oled.h(52): note: passing argument to parameter 'chr' here
 void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
                                                   ^
 6 warnings generated.
 compiling main.c...
 linking...
-Program Size: Code=45772 RO-data=4540 RW-data=1404 ZI-data=18972  
+Program Size: Code=45404 RO-data=4284 RW-data=1404 ZI-data=18972  
 FromELF: creating hex file...
 "fish_terminal\fish_terminal.axf" - 0 Error(s), 6 Warning(s).
 
@@ -85,8 +85,8 @@ Package Vendor: Keil
 
 <h2>Collection of Component include folders:</h2>
   ./RTE/_fish_terminal
-  D:/software/Keil_v5/Packs/ARM/CMSIS/5.9.0/CMSIS/Core/Include
-  D:/software/Keil_v5/Packs/Keil/STM32F1xx_DFP/2.4.1/Device/Include
+  D:/software/Kei5/Arm/Packs/ARM/CMSIS/5.9.0/CMSIS/Core/Include
+  D:/software/Kei5/Arm/Packs/Keil/STM32F1xx_DFP/2.4.1/Device/Include
 
 <h2>Collection of Component Files used:</h2>
 
