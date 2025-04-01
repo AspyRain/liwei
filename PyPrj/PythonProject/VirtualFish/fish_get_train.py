@@ -29,7 +29,7 @@ SPEED_VARIATION = 0.2  # 速度变化的平滑度
 
 # 添加固定图形
 FIXED_ICON_SIZE = 40  # 固定图形的大小
-FIXED_ICON_MARGIN = 10  # 离边缘的距离
+FIXED_ICON_MARGIN = (650/2)-20  # 离边缘的距离
 
 # 如果有固定的图片，加载它：
 fixed_icon = pygame.image.load("assets/锚定矩形.png")  # 你可以替换成自己的图标
