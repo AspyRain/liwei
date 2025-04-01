@@ -178,36 +178,33 @@ uint8_t DS18B20_Init(void)
     return DS18B20_Presence();
 }
 
+// 获取DS18B20的温度，返回float类型
 float DS18B20_Get_Temp(void)
 {
-    uint8_t tpmsb, tplsb;
-    short s_tem;
-    float f_tem;
-
-    rt_kprintf("Starting temperature conversion...\n");
-
+    uint8_t TL, TH;
+    float temp;
+    DS18B20_Start();           // 启动转换
     DS18B20_Rst();
-    DS18B20_Presence();
-    DS18B20_Write_Byte(0xCC);  // 跳过 ROM
-    DS18B20_Write_Byte(0x44);  // 开始转换
+    DS18B20_Check();
+    DS18B20_Write_Byte(0xcc);  // Skip ROM
+    DS18B20_Write_Byte(0xbe);  // 读取温度
+    TL = DS18B20_Read_Byte();  // LSB
+    TH = DS18B20_Read_Byte();  // MSB
 
-    delay_us(750);  // 等待转换完成
-
-    DS18B20_Rst();
-    DS18B20_Presence();
-    DS18B20_Write_Byte(0xCC);  // 跳过 ROM
-    DS18B20_Write_Byte(0xBE);  // 读取温度值
-
-    tplsb = DS18B20_Read_Byte();
-    tpmsb = DS18B20_Read_Byte();
-
-    s_tem = (tpmsb << 8) | tplsb;
-    if (s_tem < 0)  // 负温度
-        f_tem = (~s_tem + 1) * 0.0625;
+    if (TH > 7)  // 负数处理
+    {
+        TH = ~TH;
+        TL = ~TL;
+        temp = 0;  // 温度为负数
+    }
     else
-        f_tem = s_tem * 0.625;
+    {
+        temp = 1;  // 温度为正数
+    }
 
-    rt_kprintf("Temperature read: %.2f°C\n", f_tem);
-
-    return f_tem;
+    temp = TH;
+    temp <<= 8;
+    temp += TL;
+    temp = (float)temp * 0.625;  // 转换为温度值
+    return temp;  // 返回温度值（float）
 }

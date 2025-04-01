@@ -61,8 +61,8 @@ rt_thread_t rt_thread_begin(const char *name,
                              rt_uint8_t  priority,
                              rt_uint32_t tick);
 
-void get_ph(void *prmt);
-void get_turbidity(void *prmt);
+
+void testing_water(void *prmt);
 void oled_menu(void *prmt);
 void data_controller(void *prmt);
 void clearUsart();
@@ -72,7 +72,7 @@ float Get_pH_Value(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define PH_IN0_Pin GPIO_PIN_0
+#define PH_IN0_Pin GPIO_PIN_6
 #define PH_IN0_GPIO_Port GPIOA
 #define TDS_INO_Pin GPIO_PIN_1
 #define TDS_INO_GPIO_Port GPIOA
@@ -88,7 +88,7 @@ float Get_pH_Value(void);
 #define FISH_TX_GPIO_Port GPIOB
 #define FISH_RX_Pin GPIO_PIN_11
 #define FISH_RX_GPIO_Port GPIOB
-#define DS18B20_Pin GPIO_PIN_12
+#define DS18B20_Pin GPIO_PIN_0
 #define DS18B20_GPIO_Port GPIOA
 #define OLED_SCL_Pin GPIO_PIN_6
 #define OLED_SCL_GPIO_Port GPIOB

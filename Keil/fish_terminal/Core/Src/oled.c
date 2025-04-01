@@ -223,3 +223,16 @@ void OLED_ShowStart()
 	
 }
 
+void format_string(char *str, float value,int max_str_len) {
+    int len = snprintf(str, max_str_len, "%.1f", value); // 格式化浮点数，保留一位小数
+    if (len < max_str_len) {
+        // 填充空格
+        for (int i = len; i < max_str_len - 1; i++) {
+            str[i] = ' ';
+        }
+        str[max_str_len - 1] = '\0'; // 确保字符串结束符
+    } else {
+        // 如果超长，直接截断
+        str[max_str_len - 1] = '\0';
+    }
+}

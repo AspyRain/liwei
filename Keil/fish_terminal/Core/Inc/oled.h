@@ -56,4 +56,6 @@ void OLED_ShowString(uint8_t x,uint8_t y,uint8_t *chr,uint8_t Char_Size);
 void OLED_ShowCHinese(uint8_t x,uint8_t y,uint8_t no);
 void OLED_Showtime(void *pmt);
 void OLED_ShowStart();
+
+void format_string(char *str, float value,int max_str_len);
 #endif
