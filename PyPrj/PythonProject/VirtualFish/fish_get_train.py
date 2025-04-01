@@ -27,6 +27,15 @@ MAX_SIZE = 200  # 最大尺寸
 
 SPEED_VARIATION = 0.2  # 速度变化的平滑度
 
+# 添加固定图形
+FIXED_ICON_SIZE = 40  # 固定图形的大小
+FIXED_ICON_MARGIN = 10  # 离边缘的距离
+
+# 如果有固定的图片，加载它：
+fixed_icon = pygame.image.load("assets/锚定矩形.png")  # 你可以替换成自己的图标
+fixed_icon = pygame.transform.scale(fixed_icon, (FIXED_ICON_SIZE, FIXED_ICON_SIZE))
+
+
 # 方块类
 class Block:
     def __init__(self, style_paths, growth_rate):
@@ -91,8 +100,8 @@ running = True
 last_screenshot_time = pygame.time.get_ticks()
 
 # 创建image文件夹（如果不存在的话）
-if not os.path.exists("image"):
-    os.makedirs("image")
+if not os.path.exists("images"):
+    os.makedirs("images")
 
 # 截图计数器
 screenshot_count = 0
@@ -117,12 +126,15 @@ while running:
         block.move()
         block.draw(screen)
 
+    # 在左上角绘制固定图形
+    screen.blit(fixed_icon, (FIXED_ICON_MARGIN, FIXED_ICON_MARGIN))
+
     # 检查是否到了截屏时间（每10秒）
     current_time = pygame.time.get_ticks()
     if current_time - last_screenshot_time >= 10000:  # 10秒
         last_screenshot_time = current_time  # 更新上次截图时间
         if screenshot_count < 100:  # 如果截图数量小于100
-            screenshot_filename = f"image/screenshot_{screenshot_count + 1}.png"  # 截图文件名
+            screenshot_filename = f"images/screenshot_{screenshot_count + 1}.png"  # 截图文件名
             pygame.image.save(screen, screenshot_filename)  # 保存截图
             print(f"Saved screenshot: {screenshot_filename}")
             screenshot_count += 1  # 增加截图计数器
