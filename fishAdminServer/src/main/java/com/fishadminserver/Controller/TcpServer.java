@@ -138,15 +138,15 @@ public class TcpServer implements Runnable {
             float cur_turbidity = Float.parseFloat(parts[2]);
 
             // 首次赋值时进行范围检查
-            if (temperature == null && (cur_temperature < -10 || cur_temperature > 100)) {
+            if ( (cur_temperature < -10 || cur_temperature > 100)) {
                 System.out.println("Temperature out of range on first input, ignoring data: " + cur_temperature);
                 return;
             }
-            if (phValue == null && (cur_phValue < 0 || cur_phValue > 14)) {
+            if ((cur_phValue < 0 || cur_phValue > 14)) {
                 System.out.println("pH value out of range on first input, ignoring data: " + cur_phValue);
                 return;
             }
-            if (turbidity == null && (cur_turbidity < 0 || cur_turbidity > 2000)) {
+            if ((cur_turbidity < 0 || cur_turbidity > 2000)) {
                 System.out.println("Turbidity out of range on first input, ignoring data: " + cur_turbidity);
                 return;
             }
@@ -198,11 +198,11 @@ public class TcpServer implements Runnable {
             float cur_size = Float.parseFloat(parts[1]);
 
             // 首次赋值时进行范围检查
-            if (speed == null && (cur_speed < 0 || cur_speed > 100)) {
+            if ((cur_speed < 0 || cur_speed > 100)) {
                 System.out.println("Speed out of range on first input, ignoring data: " + cur_speed);
                 return;
             }
-            if (size == null && (cur_size < 0 || cur_size > 100)) {
+            if ((cur_size < 0 || cur_size > 100)) {
                 System.out.println("Size out of range on first input, ignoring data: " + cur_size);
                 return;
             }
