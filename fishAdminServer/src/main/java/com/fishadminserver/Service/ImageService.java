@@ -33,15 +33,19 @@ public class ImageService {
     }
 
     public void addImage(String imageStr) {
-        // 1. 先将 Base64 图片转换为 byte[]
-        Image image = new Image();
-        image.setImage(Base64Utils.decodeToByteArray(imageStr));
-        image.setType(Base64Utils.extractMimeType(imageStr));
 
-        int imageId = imageRepository.save(image).getId();  // 获取插入的 image ID
         FishRecords fishRecords=fishRecordsRepository.findLatestFishRecord();
-        fishRecords.setImageId(imageId);
-        fishRecordsRepository.save(fishRecords);
+        if (fishRecords!=null) {
+            // 1. 先将 Base64 图片转换为 byte[]
+            Image image = new Image();
+            image.setImage(Base64Utils.decodeToByteArray(imageStr));
+            image.setType(Base64Utils.extractMimeType(imageStr));
+
+            int imageId = imageRepository.save(image).getId();  // 获取插入的 image ID
+            fishRecords.setImageId(imageId);
+            fishRecordsRepository.save(fishRecords);
+        }
+
     }
     public String getImage(int imageId) {
         Image image = imageRepository.findById(imageId).get();

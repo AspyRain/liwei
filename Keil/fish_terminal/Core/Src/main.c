@@ -69,8 +69,6 @@ char TDS_Buff[6];   // TDS存放数组
 float TEMP_Value = 0.0;
 float PH_Value = 0.0;
 float TDS_Value = 0.0;
-float SIZE_Value = 0.0;
-float SPEED_Value = 0.0;
 char *realCommand;
 int pub_tick = 0;
 /* USER CODE END PV */
@@ -135,10 +133,10 @@ int main(void)
                                           oled_menu, RT_NULL,
                                           1024, 3, 10);
 
-  // rt_thread_t data_controller_task = rt_thread_begin("data_controller_task",
-  //                                           data_controller, RT_NULL,
-  //                                           1024, 3, 10);
-  esp_flag = 1;
+  rt_thread_t data_controller_task = rt_thread_begin("data_controller_task",
+                                            data_controller, RT_NULL,
+                                            1024, 3, 10);
+ 
   while (esp_flag == 0)
   {
     rt_thread_mdelay(20);
@@ -292,11 +290,6 @@ void oled_menu(void *prmt)
   OLED_ShowString(index[2][0].x, index[2][0].y, "PH", 16); // PH
   OLED_ShowChar(index[2][1].x, index[2][1].y, ':', 16);
 
-  OLED_ShowCHinese(index[3][0].x, index[3][0].y, 14); // 尺
-  OLED_ShowCHinese(index[3][1].x, index[3][1].y, 15); // 寸
-
-  OLED_ShowCHinese(index[3][4].x, index[3][4].y, 0);  // 鱼速
-  OLED_ShowCHinese(index[3][5].x, index[3][5].y, 16); // 
 
   while (1)
   {
@@ -318,17 +311,6 @@ void oled_menu(void *prmt)
           OLED_ShowString(index[2][2].x, index[2][2].y, phStr, 16); // 假设显示 (0, 0) 位置，使 16 号字
       }
   
-      {
-          char SIZEStr[5]; // 用来存放格式化后的字符串
-          format_string(SIZEStr, SIZE_Value,5);
-          OLED_ShowString(index[3][2].x, index[3][2].y, SIZEStr, 15); // 假设显示 (0, 0) 位置，使 15 号字
-      }
-  
-      {
-          char SPEEDStr[5]; // 用来存放格式化后的字符串
-          format_string(SPEEDStr, SPEED_Value,5);
-          OLED_ShowString(index[3][6].x, index[3][6].y, SPEEDStr, 15); // 假设显示 (0, 0) 位置，使 15 号字
-      }
   
       rt_thread_mdelay(1000);
   }
@@ -337,20 +319,20 @@ void oled_menu(void *prmt)
 void data_controller(void *prmt)
 {
   // wifi初始化
-  Esp01s_Init("AspyRain", "[FrommetoU]", "192.168.70.191", 8888);
+  Esp01s_Init("504", "abcd761124", "119.29.243.196", 8887);
   while (esp_flag)
   {
     char buffer[100]; // 预留足够的空间存放字符串
 
     // 格式化字符串，保留一位小数
-    sprintf(buffer, "data:%.1f,%.1f,%.1f,%.1f,%.1f\n",
-            TEMP_Value, PH_Value, TDS_Value, SIZE_Value, SPEED_Value);
+    sprintf(buffer, "data:%.1f,%.1f,%.1f\n",
+            TEMP_Value, PH_Value, TDS_Value);
 
     // 打印结果
     rt_kprintf("发送数据:%s\n", buffer);
     espSend(buffer, 0);
     rt_kprintf("正在运行:wifi通信\n");
-    rt_thread_mdelay(2000);
+    rt_thread_mdelay(30000);
   }
 }
 

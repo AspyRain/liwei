@@ -11,7 +11,7 @@ import java.util.List;
 public interface FishWaterRepository extends JpaRepository<FishWater, Integer> {
 
     // 查找最近 24 小时的数据
-    @Query("SELECT fw FROM FishWater fw WHERE fw.date >= :startTime ORDER BY fw.date DESC")
+    @Query("SELECT fw FROM FishWater fw WHERE fw.date >= :startTime ORDER BY fw.date ")
     List<FishWater> findRecentRecords(@Param("startTime") LocalDateTime startTime);
 
     // 统计前 n 天的平均值
@@ -23,7 +23,7 @@ public interface FishWaterRepository extends JpaRepository<FishWater, Integer> {
             "WHERE fw.date >= :startDate " +  // 过滤起始日期
             "AND fw.date < DATE_ADD(:startDate, INTERVAL :days DAY) " +  // 确保查询范围
             "GROUP BY DATE(fw.date) " +
-            "ORDER BY DATE(fw.date) DESC", nativeQuery = true)
+            "ORDER BY DATE(fw.date) ", nativeQuery = true)
     List<Object[]> findDailyAverages(@Param("startDate") LocalDateTime startDate, @Param("days") int days);
 
 
