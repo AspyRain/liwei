@@ -136,7 +136,7 @@ int main(void)
   rt_thread_t data_controller_task = rt_thread_begin("data_controller_task",
                                             data_controller, RT_NULL,
                                             1024, 3, 10);
- 
+
   while (esp_flag == 0)
   {
     rt_thread_mdelay(20);

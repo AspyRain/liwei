@@ -14,7 +14,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Random Moving Blocks")
 
 # 加载背景图片（可替换）
-background = pygame.image.load("assets/background.jpg")
+background = pygame.image.load("assets/bg_mix.jpg")
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
 # 可选的方块样式（图片路径）
@@ -24,7 +24,7 @@ ALL_BLOCK_STYLES = [
 ]
 SIMPLE_BLOCK_STYLES = ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"]
 BLOCK_SIZE = 45  # 初始大小
-GROWTH_RATES = [0.0005, 0.0008, 0.001]  # 可选的成长速度
+GROWTH_RATES = [0.0005, 0.0008, 0.0001]  # 可选的成长速度
 MAX_SIZE = 200  # 最大尺寸
 
 SPEED_VARIATION = 0.01  # 速度变化的平滑度

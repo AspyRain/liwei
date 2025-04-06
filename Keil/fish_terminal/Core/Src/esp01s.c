@@ -17,7 +17,7 @@ void Esp01s_Init(char *ip, char *password, char *server,int port)
   rt_thread_mdelay(2000);
   
   sendData(&huart2, "AT+CWMODE=1\r\n");
-  rt_thread_mdelay(2000);
+  rt_thread_mdelay(2000);   
   sprintf(command, "AT+CWJAP=\"%s\",\"%s\"\r\n", ip, password);
   sendData(&huart2, command);
   rt_thread_mdelay(5000);
