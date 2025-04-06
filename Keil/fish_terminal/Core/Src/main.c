@@ -134,8 +134,8 @@ int main(void)
                                           1024, 3, 10);
 
   rt_thread_t data_controller_task = rt_thread_begin("data_controller_task",
-                                            data_controller, RT_NULL,
-                                            1024, 3, 10);
+                                                     data_controller, RT_NULL,
+                                                     1024, 3, 10);
 
   while (esp_flag == 0)
   {
@@ -202,6 +202,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+// 创建并启动一个线程
 rt_thread_t rt_thread_begin(const char *name,
                             void (*entry)(void *parameter),
                             void *parameter,
@@ -209,75 +210,100 @@ rt_thread_t rt_thread_begin(const char *name,
                             rt_uint8_t priority,
                             rt_uint32_t tick)
 {
+  // 创建线程
   rt_thread_t task = rt_thread_create(name,
                                       entry, RT_NULL,
-                                      stack_size, priority, tick); //
+                                      stack_size, priority, tick);
+
+  // 如果线程创建成功，则启动线程
   if (task != RT_NULL)
   {
-    rt_thread_startup(task);
-    rt_kprintf("%s thread is already started\n", name);
+    rt_thread_startup(task);                            // 启动线程
+    rt_kprintf("%s thread is already started\n", name); // 打印线程启动信息
     return task;
   }
   else
   {
-    rt_kprintf("%s thread is not started\n", name);
-    return RT_NULL;
+    rt_kprintf("%s thread is not started\n", name); // 打印线程启动失败信息
+    return RT_NULL;                                 // 返回 NULL 表示线程创建失败
   }
 }
 
-// 获取浑浊�???/温度
+// 获取浑浊度和温度信息
 void testing_water(void *prmt)
 {
-  DS18B20_Init();
+  DS18B20_Init(); // 初始化温度传感器 DS18B20
+
+  // 等待 ESP 标志位为 1 才开始运行
   while (esp_flag == 0)
   {
-    rt_thread_mdelay(50);
+    rt_thread_mdelay(50); // 延时50ms
   }
+
+  // 主循环获取水温和浑浊度数据
   while (1)
   {
-    rt_kprintf("正在运行:getturbidity\n");
+    rt_kprintf("正在运行:getturbidity\n"); // 打印获取浑浊度信息
+
+    // 获取温度并转换为浮动温度值（单位°C）
     TEMP_Value = (float)DS18B20_Get_Temp() / 10;
+
+    // 将温度值格式化为字符数组以便显示
     TEMP_Buff[0] = (int)(TEMP_Value) % 1000 / 100 + '0';
     TEMP_Buff[1] = (int)(TEMP_Value) % 100 / 10 + '0';
     TEMP_Buff[2] = '.';
     TEMP_Buff[3] = (int)(TEMP_Value) % 10 + '0';
 
+    // 获取并转换 TDS（总溶解固体）值
     TDS_Value_Conversion(TEMP_Value);
+
+    // 获取 pH 值
     PH_Value = Get_pH_Value();
+
+    // 打印 TDS、温度和 pH 值
     rt_kprintf("tds: %d\ntemp:%d", (int)TDS_Value, (int)TEMP_Value);
-    rt_thread_mdelay(1000);
+
+    rt_thread_mdelay(1000); // 每隔 1 秒获取一次数据
   }
 }
+
 // 获取 pH 值的函数
 float Get_pH_Value(void)
 {
   // 1. 读取 ADC 数据
-  HAL_ADC_Start(&hadc1);                            // 开始 ADC 转换
+  HAL_ADC_Start(&hadc1);                            // 启动 ADC 转换
   HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY); // 等待转换完成
   uint32_t adc_value = HAL_ADC_GetValue(&hadc1);    // 获取 ADC 转换结果
-  HAL_ADC_Stop(&hadc1);
+  HAL_ADC_Stop(&hadc1);                             // 停止 ADC 转换
+
   // 2. 计算电压 (假设 Vref = 3.3V, 12-bit ADC)
   float voltage = (adc_value / 4095.0) * 3.3;
   rt_kprintf("电压大小: %d\n", (int)(voltage * 1000));
+
   // 3. 计算 pH 值 (pH 7 对应 2.5V, 斜率 59.16 mV/pH)
   float pH = (voltage - 2.5) / 0.05916 + 7.0;
-  // 5. 进行温度补偿 (温度漂移系数 -0.03 pH/°C)
+
+  // 4. 进行温度补偿 (温度漂移系数 -0.03 pH/°C)
   float pH_T = pH + (TEMP_Value - 25.0) * (-0.03);
-  return pH_T;
+
+  return pH_T; // 返回计算后的 pH 值
 }
-// oled显示
+
+// OLED 显示函数
 void oled_menu(void *prmt)
 {
-  OLED_Init();
-  OLED_Clear();
-  OLED_ShowStart();
+  OLED_Init();      // 初始化 OLED 显示器
+  OLED_Clear();     // 清屏
+  OLED_ShowStart(); // 显示启动画面
 
+  // 等待 ESP 标志位为 1 才开始运行
   while (esp_flag == 0)
   {
-    rt_thread_mdelay(50);
+    rt_thread_mdelay(50); // 延时50ms
   }
 
-  OLED_Clear();
+  OLED_Clear(); // 清屏
+  // 显示各项信息的文字
   OLED_ShowCHinese(index[0][0].x, index[0][0].y, 10); // 温
   OLED_ShowCHinese(index[0][1].x, index[0][1].y, 13); // 度
   OLED_ShowChar(index[0][2].x, index[0][2].y, ':', 16);
@@ -290,67 +316,70 @@ void oled_menu(void *prmt)
   OLED_ShowString(index[2][0].x, index[2][0].y, "PH", 16); // PH
   OLED_ShowChar(index[2][1].x, index[2][1].y, ':', 16);
 
-
   while (1)
   {
-      {
-          char tempStr[5]; // 用来存放格式化后的字符串
-          format_string(tempStr, TEMP_Value,5);
-          OLED_ShowString(index[0][3].x, index[0][3].y, tempStr, 16); // 假设显示 (0, 0) 位置，使 16 号字
-      }
-  
-      {
-          char TDSStr[6]; // 用来存放格式化后的字符串
-          format_string(TDSStr, TDS_Value,6);
-          OLED_ShowString(index[1][4].x, index[1][4].y, TDSStr, 16); // 假设显示 (0, 0) 位置，使 16 号字
-      }
-  
-      {
-          char phStr[5]; // 用来存放格式化后的字符串
-          format_string(phStr, PH_Value,5);
-          OLED_ShowString(index[2][2].x, index[2][2].y, phStr, 16); // 假设显示 (0, 0) 位置，使 16 号字
-      }
-  
-  
-      rt_thread_mdelay(1000);
+    // 显示温度信息
+    {
+      char tempStr[5]; // 用来存放格式化后的字符串
+      format_string(tempStr, TEMP_Value, 5);
+      OLED_ShowString(index[0][3].x, index[0][3].y, tempStr, 16); // 显示温度
+    }
+
+    // 显示 TDS 信息
+    {
+      char TDSStr[6]; // 用来存放格式化后的字符串
+      format_string(TDSStr, TDS_Value, 6);
+      OLED_ShowString(index[1][4].x, index[1][4].y, TDSStr, 16); // 显示 TDS
+    }
+
+    // 显示 pH 信息
+    {
+      char phStr[5]; // 用来存放格式化后的字符串
+      format_string(phStr, PH_Value, 5);
+      OLED_ShowString(index[2][2].x, index[2][2].y, phStr, 16); // 显示 pH 值
+    }
+
+    rt_thread_mdelay(1000); // 每秒更新一次显示
   }
 }
-// 数据控制- wifi通信
+
+// 数据控制 - Wi-Fi 通信
 void data_controller(void *prmt)
 {
-  // wifi初始化
+  // Wi-Fi 初始化
   Esp01s_Init("504", "abcd761124", "119.29.243.196", 8887);
+
+  // 等待 ESP 标志位为 1 才开始通信
   while (esp_flag)
   {
-    char buffer[100]; // 预留足够的空间存放字符串
+    char buffer[100]; // 预留足够的空间存放数据
 
-    // 格式化字符串，保留一位小数
-    sprintf(buffer, "data:%.1f,%.1f,%.1f\n",
-            TEMP_Value, PH_Value, TDS_Value);
-
-    // 打印结果
+    // 格式化数据并发送给 Wi-Fi
+    sprintf(buffer, "data:%.1f,%.1f,%.1f\n", TEMP_Value, PH_Value, TDS_Value);
     rt_kprintf("发送数据:%s\n", buffer);
-    espSend(buffer, 0);
+    espSend(buffer, 0); // 通过 ESP 发送数据
     rt_kprintf("正在运行:wifi通信\n");
-    rt_thread_mdelay(30000);
+    rt_thread_mdelay(30000); // 每 30 秒发送一次数据
   }
 }
 
+// TDS 值转换函数
 void TDS_Value_Conversion()
 {
-  // 1️⃣ 读取 ADC 电压（HAL 方式�????
+  // 读取 ADC 电压（通过 HAL 库）
   HAL_ADC_Start(&hadc2);
-  HAL_ADC_PollForConversion(&hadc2, 10);
-  ADC_ConvertedValue[0] = HAL_ADC_GetValue(&hadc2);
-  HAL_ADC_Stop(&hadc2);
+  HAL_ADC_PollForConversion(&hadc2, 10);            // 等待 ADC 转换完成
+  ADC_ConvertedValue[0] = HAL_ADC_GetValue(&hadc2); // 获取 ADC 转换值
+  HAL_ADC_Stop(&hadc2);                             // 停止 ADC 转换
 
-  ADC_ConvertedValueLocal[0] = (float)ADC_ConvertedValue[0] / 4096 * 3.3; // AD 转换
+  // 计算 ADC 转换结果对应的电压值
+  ADC_ConvertedValueLocal[0] = (float)ADC_ConvertedValue[0] / 4096 * 3.3;
 
-  // 3️⃣ 计算温度补偿系数
+  // 计算温度补偿系数
   compensationCoefficient = 1.0 + 0.02 * (TEMP_Value - 25.0);
   compensationVolatge = ADC_ConvertedValueLocal[0] / compensationCoefficient;
 
-  // 4️⃣ TDS 计算
+  // 使用公式计算 TDS 值
   if (ADC_ConvertedValueLocal[0] >= 0 && ADC_ConvertedValueLocal[0] < 0.1)
   {
     compensationVolatge = 0;
@@ -358,7 +387,7 @@ void TDS_Value_Conversion()
 
   TDS_Value = (133.42 * compensationVolatge * compensationVolatge * compensationVolatge - 255.86 * compensationVolatge * compensationVolatge + 857.39 * compensationVolatge) * 0.5 * kValue;
 
-  // 5️⃣ 限制 TDS 范围
+  // 限制 TDS 值的范围
   if (TDS_Value <= 0)
   {
     TDS_Value = 0;
@@ -369,14 +398,17 @@ void TDS_Value_Conversion()
   }
 }
 
+// 清空 USART 接收缓冲区
 void clearUsart()
 {
   memset(usart2_rx_buffer, 0, sizeof(usart2_rx_buffer));
   usart2_rx_index = 0;
 }
 
+// 接收数据函数
 void reciveData()
 {
+  // 如果接收缓冲区未满，继续接收数据
   if (usart2_rx_index == -1)
     usart2_rx_index++;
   else
@@ -384,25 +416,23 @@ void reciveData()
     switch (esp_command_flag)
     {
     case 1:
-
       if (usart2_rx_index < dataMaxLen)
       {
         dataLenStr[usart2_rx_index++] = usart2_c;
       }
       else
       {
-        rt_kprintf("data too long!\n");
+        rt_kprintf("data too long!\n"); // 数据过长
       }
       break;
     case 2:
-
       if (usart2_rx_index < dataLen)
       {
         realCommand[usart2_rx_index++] = usart2_c;
       }
       else
       {
-        rt_kprintf("data error!\n");
+        rt_kprintf("data error!\n"); // 数据错误
       }
       break;
     default:
@@ -412,48 +442,27 @@ void reciveData()
   }
 }
 
+// USART 中断回调函数
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   if (huart == &huart2)
   {
     if (esp_command_flag == 3)
-      esp_command_flag = 0;
+      esp_command_flag = 0; // 处理特定的命令标志
     if (usart2_rx_index >= BUFFER_SIZE - 1)
     {
-      clearUsart();
+      clearUsart(); // 如果缓冲区满，清空缓冲区
     }
     if (usart2_c == '\n')
     {
-      rt_kprintf("%s", usart2_rx_buffer);
+      rt_kprintf("%s", usart2_rx_buffer); // 打印接收到的数据
     }
-    // if (esp_flag == 1)
-    // {
-    //   if (usart2_c == '+')
-    //   {
-    //     clearUsart();
-    //   }
-    //   else if (strstr((const char *)usart2_rx_buffer, "+IPD,0,") != NULL) // ???????,????????
-    //   {
-    //     // ???????
-    //     esp_command_flag = 1;
-    //     // ???????,?????????
-    //     clearUsart();
-    //   }
-    //   else if (esp_command_flag == 1 && usart2_c == ':') // ??????
-    //   {
-    //     esp_command_flag = 2;
-    //     dataLen = atoi(dataLenStr);
-    //     usart2_rx_index = -1;
-    //     memset(dataLenStr, 0, sizeof(dataLenStr));
-    //     realCommand = (char *)malloc((dataLen * sizeof(char)) + 1);
-    //     realCommand[dataLen] = '\0';
-    //   }
-    //}
-    reciveData();
-    // ?????????
-    HAL_UART_Receive_IT(&huart2, (uint8_t *)&usart2_c, 1);
+
+    reciveData();                                          // 处理接收到的数据
+    HAL_UART_Receive_IT(&huart2, (uint8_t *)&usart2_c, 1); // 重新开启接收中断
   }
 }
+
 /* USER CODE END 4 */
 
 /**
