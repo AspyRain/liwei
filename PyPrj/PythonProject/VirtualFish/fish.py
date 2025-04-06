@@ -1,6 +1,6 @@
 import pygame
 import random
-
+#模拟鱼塘
 # 初始化pygame
 pygame.init()
 
