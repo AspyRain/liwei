@@ -4,7 +4,7 @@ import time
 import os
 import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter
-
+#模拟鱼塘+截图获取图片数据
 # 初始化pygame
 pygame.init()
 
