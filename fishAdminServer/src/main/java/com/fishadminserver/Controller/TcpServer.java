@@ -152,15 +152,15 @@ public class TcpServer implements Runnable {
             }
 
             // 检查数据变化幅度
-            if (lastTemperature != null && Math.abs(cur_temperature - lastTemperature) > MAX_TEMP_CHANGE) {
+            if (lastTemperature != null && (Math.abs(cur_temperature - lastTemperature) > MAX_TEMP_CHANGE) ) {
                 System.out.println("Temperature change too large, ignoring data: " + cur_temperature);
                 return;
             }
-            if (lastPhValue != null && Math.abs(cur_phValue - lastPhValue) > MAX_PH_CHANGE) {
+            if (lastPhValue != null && (Math.abs(cur_phValue - lastPhValue) > MAX_PH_CHANGE)) {
                 System.out.println("pH value change too large, ignoring data: " + cur_phValue);
                 return;
             }
-            if (lastTurbidity != null && Math.abs(cur_turbidity - lastTurbidity) > MAX_TURBIDITY_CHANGE) {
+            if (lastTurbidity != null && (Math.abs(cur_turbidity - lastTurbidity) > MAX_TURBIDITY_CHANGE)) {
                 System.out.println("Turbidity change too large, ignoring data: " + cur_turbidity);
                 return;
             }
@@ -212,7 +212,7 @@ public class TcpServer implements Runnable {
                 System.out.println("Speed change too large, ignoring data: " + cur_speed);
                 return;
             }
-            if (lastSize != null && Math.abs(cur_size - lastSize) > MAX_SIZE_CHANGE) {
+            if (lastSize != null && (Math.abs(cur_size - lastSize) > MAX_SIZE_CHANGE) && Math.abs(cur_size - lastSize) != 0 ) {
                 System.out.println("Size change too large, ignoring data: " + cur_size);
                 return;
             }
