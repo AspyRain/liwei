@@ -62,7 +62,7 @@ int dataLen;
 char dataLenStr[dataMaxLen];
 float ADC_ConvertedValueLocal[3] = {0};
 uint16_t ADC_ConvertedValue[3] = {0};
-float compensationCoefficient, compensationVolatge;
+float compensationCoefficient, compensationVoltage;
 float kValue = 1.0; // 传感器校准系�????
 char TEMP_Buff[5];  // 温度存放数组
 char TDS_Buff[6];   // TDS存放数组
@@ -289,6 +289,8 @@ float Get_pH_Value(void)
   return pH_T; // 返回计算后的 pH 值
 }
 
+
+
 // OLED 显示函数
 void oled_menu(void *prmt)
 {
@@ -377,15 +379,16 @@ void TDS_Value_Conversion()
 
   // 计算温度补偿系数
   compensationCoefficient = 1.0 + 0.02 * (TEMP_Value - 25.0);
-  compensationVolatge = ADC_ConvertedValueLocal[0] / compensationCoefficient;
+  compensationVoltage = ADC_ConvertedValueLocal[0] / compensationCoefficient;
 
   // 使用公式计算 TDS 值
   if (ADC_ConvertedValueLocal[0] >= 0 && ADC_ConvertedValueLocal[0] < 0.1)
   {
-    compensationVolatge = 0;
+    compensationVoltage = 0;
   }
 
-  TDS_Value = (133.42 * compensationVolatge * compensationVolatge * compensationVolatge - 255.86 * compensationVolatge * compensationVolatge + 857.39 * compensationVolatge) * 0.5 * kValue;
+  TDS_Value = (133.42 * compensationVoltage * compensationVoltage * compensationVoltage - 255.86 * compensationVoltage * compensationVoltage + 857.39 * compensationVoltage)
+                   * 0.5 * kValue;
 
   // 限制 TDS 值的范围
   if (TDS_Value <= 0)

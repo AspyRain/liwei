@@ -35,6 +35,43 @@ void Esp01s_Init(char *ip, char *password, char *server,int port)
   rt_kprintf("初始化完成\n");
 }
 
+// 生成数据的函数
+void generateDataString(char *buffer, float temperature, float humidity, float brightness, float co)
+{
+    // 格式化数据并生成 JSON 格式字符串
+    sprintf(buffer, "{\"temperature\": %.2f, \"humidity\": %.2f, \"brightness\": %.2f, \"co\": %.2f}",
+            temperature, humidity, brightness, co);
+}
+
+// 生成完整的 HTTP POST 请求字符串
+void generateHttpPostRequest(char *buffer, const char *ip, float temperature, float humidity, float brightness, float co)
+{
+    char dataString[100];
+    generateDataString(dataString, temperature, humidity, brightness, co);
+
+    // 请求头部分
+    sprintf(buffer, 
+            "POST /soil/save HTTP/1.1\r\n"
+            "Host: %s:8080\r\n"
+            "Content-Type: application/json\r\n"
+            "Content-Length: %lu\r\n"
+            "\r\n"  // 空行分隔头部和数据部分
+            "%s",   // JSON 数据
+            ip, strlen(dataString), dataString); // 将生成的JSON数据填入
+}
+
+// 发送数据到 ESP-01S
+void espSendWithRequest(char *ip, float temperature, float humidity, float brightness, float co)
+{
+    char requestBuffer[200];  // 用于保存完整的 HTTP 请求
+
+    // 生成完整的 HTTP 请求
+    generateHttpPostRequest(requestBuffer, ip, temperature, humidity, brightness, co);
+
+    // 调用发送函数
+    espSend(requestBuffer, 1);  // 1 表示添加换行符
+}
+
 void espSend(char *message, int enterFlag)
 {
   char command[50];

@@ -20,25 +20,27 @@ public class TcpServer implements Runnable {
     private static Float temperature = null;
     private static Float phValue = null;
     private static Float turbidity = null;
-    private static Float speed = null;
+    private static Float density = null;
     private static Float size = null;
 
     // 上一条数据，用于计算变化幅度
     private static Float lastTemperature = null;
     private static Float lastPhValue = null;
     private static Float lastTurbidity = null;
-    private static Float lastSpeed = null;
+    private static Float lastdensity = null;
     private static Float lastSize = null;
 
     // 用户可设置的幅度限制
     private static final float MAX_TEMP_CHANGE = 5.0f; // 温度最大变化幅度（单位：摄氏度）
     private static final float MAX_PH_CHANGE = 20f;   // pH 值最大变化幅度
     private static final float MAX_TURBIDITY_CHANGE = 1000.0f; // 浑浊度最大变化幅度
-    private static final float MAX_SPEED_CHANGE = 5.0f; // 速度最大变化幅度（单位：cm/s）
-    private static final float MAX_SIZE_CHANGE = 5.0f;   // 尺寸最大变化幅度（单位：cm）
+    private static final float MAX_density_CHANGE = 5.0f; // 速度最大变化幅度（单位：cm/s）
+    private static final float MAX_SIZE_CHANGE = 10.0f;   // 尺寸最大变化幅度（单位：cm）
 
     @Autowired
     private FishWaterService fishWaterService;
+
+    private static volatile long lastDataTimestamp = System.currentTimeMillis();
 
     public TcpServer() {
         Thread serverThread = new Thread(this);
@@ -100,11 +102,12 @@ public class TcpServer implements Runnable {
             String message;
             while ((message = reader.readLine()) != null) {
                 System.out.println("Received message: " + message);
-
+                lastDataTimestamp = System.currentTimeMillis();
                 // 根据端口处理数据
                 if (port == 1) {
                     // 端口1用于接收温度、ph、浑浊度
                     processDataForWaterQuality(message);
+
                 } else if (port == 2) {
                     // 端口2用于接收速度和尺寸
                     processDataForFish(message);
@@ -193,13 +196,13 @@ public class TcpServer implements Runnable {
                 System.out.println("Invalid data format, expected 2 values: " + message);
                 return;
             }
-
-            float cur_speed = Float.parseFloat(parts[0]);
-            float cur_size = Float.parseFloat(parts[1]);
+            float cur_size = Float.parseFloat(parts[0]);
+            float cur_density = Float.parseFloat(parts[1]);
+            
 
             // 首次赋值时进行范围检查
-            if ((cur_speed < 0 || cur_speed > 100)) {
-                System.out.println("Speed out of range on first input, ignoring data: " + cur_speed);
+            if ((cur_density < 0 || cur_density > 100)) {
+                System.out.println("density out of range on first input, ignoring data: " + cur_density);
                 return;
             }
             if ((cur_size < 0 || cur_size > 100)) {
@@ -208,8 +211,8 @@ public class TcpServer implements Runnable {
             }
 
             // 检查数据变化幅度
-            if (lastSpeed != null && Math.abs(cur_speed - lastSpeed) > MAX_SPEED_CHANGE) {
-                System.out.println("Speed change too large, ignoring data: " + cur_speed);
+            if (lastdensity != null && Math.abs(cur_density - lastdensity) > MAX_density_CHANGE) {
+                System.out.println("density change too large, ignoring data: " + cur_density);
                 return;
             }
             if (lastSize != null && (Math.abs(cur_size - lastSize) > MAX_SIZE_CHANGE) && Math.abs(cur_size - lastSize) != 0 ) {
@@ -218,13 +221,13 @@ public class TcpServer implements Runnable {
             }
 
             // 更新数据
-            speed = cur_speed;
+            density = cur_density;
             size = cur_size;
 
-            lastSpeed = cur_speed;
+            lastdensity = cur_density;
             lastSize = cur_size;
 
-            System.out.printf("Received fish data - Speed: %s, Size: %s\n", speed, size);
+            System.out.printf("Received fish data - density: %s, Size: %s\n", density, size);
 
         } catch (Exception e) {
             System.out.println("Error processing fish data: " + e.getMessage());
@@ -248,7 +251,12 @@ public class TcpServer implements Runnable {
     }
 
     private void saveDataToDatabase() {
-        if (temperature != null && phValue != null && turbidity != null && speed != null && size != null) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastDataTimestamp > 5 * 60 * 1000) {
+            System.out.println("No new data in the last 5 minutes, skipping data save.");
+            return;
+        }
+        if (temperature != null && phValue != null && turbidity != null && density != null && size != null) {
             try {
                 // 创建记录对象并保存
                 WaterQualityRecords waterRecord = new WaterQualityRecords();
@@ -257,7 +265,7 @@ public class TcpServer implements Runnable {
                 waterRecord.setTurbidity(turbidity);
 
                 FishRecords fishRecord = new FishRecords();
-                fishRecord.setSpeed(speed);
+                fishRecord.setSpeed(density);
                 fishRecord.setSize(size);
 
                 // 保存到数据库

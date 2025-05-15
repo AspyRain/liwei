@@ -69,6 +69,7 @@ void clearUsart();
 void TDS_Value_Conversion();
 void reciveData();
 float Get_pH_Value(void);
+float Get_MQ7_PPM_Value(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -89,7 +90,7 @@ float Get_pH_Value(void);
 #define FISH_RX_Pin GPIO_PIN_11
 #define FISH_RX_GPIO_Port GPIOB
 #define DS18B20_Pin GPIO_PIN_0
-#define DS18B20_GPIO_Port GPIOA
+#define DS18B20_GPIO_Port GPIOB
 #define OLED_SCL_Pin GPIO_PIN_6
 #define OLED_SCL_GPIO_Port GPIOB
 #define OLED_SDA_Pin GPIO_PIN_7

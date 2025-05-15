@@ -1,6 +1,6 @@
 import pygame
 import random
-#模拟鱼塘
+
 # 初始化pygame
 pygame.init()
 
@@ -10,20 +10,29 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Random Moving Blocks")
 
 # 加载背景图片（可替换）
-background = pygame.image.load("assets/background.jpg")
+background = pygame.image.load("assets/bg_mix.jpg")
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
 # 可选的方块样式（图片路径）
 ALL_BLOCK_STYLES = [
-    ["assets/fish1_1.png", "assets/fish1_2.png", "assets/fish1_3.png"],
-    ["assets/fish3_1.png", "assets/fish3_2.png", "assets/fish3_3.png"]
+    ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"],
+    ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"],
 ]
-SIMPLE_BLOCK_STYLES =  ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"]
-BLOCK_SIZE = 50  # 初始大小
-GROWTH_RATES = [0.01, 0.02, 0.03]  # 可选的成长速度
-MAX_SIZE = 150  # 最大尺寸
+SIMPLE_BLOCK_STYLES = ["assets/fish2_1.png", "assets/fish2_2.png", "assets/fish2_3.png"]
+BLOCK_SIZE = 60  # 初始大小
+GROWTH_RATES = [0.04, 0.06, 0.08]  # 可选的成长速度
+MAX_SIZE = 250  # 最大尺寸
 
 SPEED_VARIATION = 0.2  # 速度变化的平滑度
+
+# 添加固定图形
+FIXED_ICON_SIZE = 40  # 固定图形的大小
+FIXED_ICON_MARGIN = (650 / 2) - 20  # 离边缘的距离
+
+# 如果有固定的图片，加载它：
+fixed_icon = pygame.image.load("assets/锚定矩形.png")  # 你可以替换成自己的图标
+fixed_icon = pygame.transform.scale(fixed_icon, (FIXED_ICON_SIZE, FIXED_ICON_SIZE))
+
 
 # 方块类
 class Block:
@@ -78,12 +87,19 @@ class Block:
         resized_image = pygame.transform.scale(self.current_style, (int(self.size), int(self.size)))
         screen.blit(resized_image, (self.x, self.y))
 
+
 # 生成多个方块，每个方块存储多个预备样式，并有不同的成长速度
-blocks = [Block(random.choice(ALL_BLOCK_STYLES), random.choice(GROWTH_RATES)) for _ in range(9)]
-blocks.append(Block(SIMPLE_BLOCK_STYLES, 0.02))
+initial_block_count = 4
+min_block_count = 2
+max_block_count = 10
+blocks = [Block(random.choice(ALL_BLOCK_STYLES), random.choice(GROWTH_RATES)) for _ in range(initial_block_count)]
+blocks.append(Block(SIMPLE_BLOCK_STYLES, 0.06))
 
 clock = pygame.time.Clock()
 running = True
+
+# 上次增加或减少鱼数量的时间
+last_fish_count_change_time = pygame.time.get_ticks()
 
 # 游戏主循环
 while running:
@@ -99,11 +115,28 @@ while running:
                 for block in blocks:
                     block.switch_style()  # 按 SPACE 键切换样式
 
+    # 每隔一定时间调整鱼的数量
+    current_time = pygame.time.get_ticks()
+    if current_time - last_fish_count_change_time >= 1000 :  # 每5秒调整一次
+        # 随机增加或减少鱼的数量
+        if len(blocks) < max_block_count:
+            if random.random() < 0.5:  # 50% 概率增加一条鱼
+                blocks.append(Block(random.choice(ALL_BLOCK_STYLES), random.choice(GROWTH_RATES)))
+        elif len(blocks) > min_block_count:
+            if random.random() < 0.5:  # 50% 概率减少一条鱼
+                blocks.pop()
+
+        last_fish_count_change_time = current_time  # 更新时间
+
+    # 处理每个方块
     for block in blocks:
         block.grow()
         block.switch_style()
         block.move()
         block.draw(screen)
+
+    # 在左上角绘制固定图形
+    screen.blit(fixed_icon, (FIXED_ICON_MARGIN, FIXED_ICON_MARGIN))
 
     pygame.display.flip()
     clock.tick(60)  # 控制帧率

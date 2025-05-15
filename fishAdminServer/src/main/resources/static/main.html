@@ -117,7 +117,7 @@
                         <table class="w-full border-collapse border border-gray-300 text-center">
                             <thead>
                                 <tr class="bg-gray-100">
-                                    <th class="border border-gray-300 px-4 py-2">速度</th>
+                                    <th class="border border-gray-300 px-4 py-2">密度</th>
                                     <th class="border border-gray-300 px-4 py-2">大小</th>
                                     <th class="border border-gray-300 px-4 py-2">pH 值</th>
                                     <th class="border border-gray-300 px-4 py-2">浊度</th>
@@ -156,22 +156,11 @@
                                             查看图片
                                         </button>
 
-                                        <!-- 图片弹窗 -->
-                                        <div v-if="showDialog"
-                                            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                            <div class="bg-white p-4 rounded-md shadow-lg">
-                                                <img :src="imageSrc" alt="图片预览" class="max-w-full max-h-96">
-                                                <button @click="showDialog = false"
-                                                    class="mt-2 px-4 py-2 bg-gray-300 rounded-md">关闭</button>
-                                            </div>
-                                        </div>
+
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-
-
-
                     </div>
 
                     <div v-if="activeTab === 'pond'"
@@ -194,8 +183,22 @@
 
                     </div>
 
-                </div>
 
+                </div>
+                <!-- 图片弹窗 -->
+                <div
+                        v-if="showDialog"
+                        class="fixed inset-0 z-50 flex items-center justify-center bg-white/30 bg-opacity-50">
+                    <div class="bg-white p-4 rounded-2xl shadow-2xl max-w-full max-h-full overflow-auto">
+                        <img :src="imageSrc" alt="图片预览" class="max-w-[90vw] max-h-[80vh] mx-auto">
+                        <div class="text-center mt-4">
+                            <button @click="showDialog = false"
+                                    class="px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded-md shadow">
+                                关闭
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -243,7 +246,7 @@
                 customDays: 1,
                 intervalId: null, // 定时器 ID
                 charts: [
-                    { id: "chart-speed", title: "鱼速 (m/s)", key: "speed" },
+                    { id: "chart-speed", title: "密度 (只/平方米)", key: "speed" },
                     { id: "chart-size", title: "鱼体长 (cm)", key: "size" },
                     { id: "chart-ph", title: "pH 值", key: "phValue" },
                     { id: "chart-turbidity", title: "浊度", key: "turbidity" },
@@ -278,7 +281,7 @@
                 },
                 getLabel(key) {
                     const labels = {
-                        speed: "水流速度",
+                        speed: "鱼群密度",
                         size: "鱼体大小",
                         phValue: "pH 值",
                         turbidity: "浊度",
@@ -528,7 +531,7 @@
                     const labels = {
                         phValue: "pH 值",
                         size: "鱼体长",
-                        speed: "鱼速",
+                        speed: "密度",
                         temperature: "温度",
                         turbidity: "浊度",
                     };
@@ -538,7 +541,7 @@
                     const units = {
                         phValue: "",
                         size: "cm",
-                        speed: "m/s",
+                        speed: "条/平方米",
                         temperature: "°C",
                         turbidity: "",
                     };
